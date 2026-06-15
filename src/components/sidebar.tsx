@@ -20,9 +20,9 @@ import { useState, useEffect } from "react"
 
 const navItems = [
   { href: "/dashboard", label: "Tableau de bord", icon: LayoutDashboard },
-  { href: "/dashboard/citizens", label: "Habitants", icon: Users },
-  { href: "/dashboard/citizens/new", label: "Nouveau habitant", icon: Plus },
-  { href: "/dashboard/reports", label: "Rapports", icon: FileText },
+  { href: "/dashboard/citizens", label: "Registre des habitants", icon: Users },
+  { href: "/dashboard/citizens/new", label: "Nouvel enregistrement", icon: Plus },
+  { href: "/dashboard/reports", label: "Rapports officiels", icon: FileText },
 ]
 
 export function Sidebar() {
@@ -71,25 +71,32 @@ export function Sidebar() {
           mobileOpen ? "translate-x-0" : "-translate-x-full"
         )}
       >
-        <div className="flex items-center justify-between p-4 md:p-6 border-b border-sidebar-border">
-          <div className="flex items-center gap-3">
-            <div className="w-9 h-9 md:w-10 md:h-10 bg-card rounded-full flex items-center justify-center shrink-0">
-              <span className="text-primary font-bold text-sm md:text-lg">AC</span>
+        <div className="p-5 border-b border-sidebar-border">
+          <div className="flex items-center gap-3 mb-3">
+            <div className="w-10 h-10 bg-gradient-to-br from-primary to-accent rounded-lg flex items-center justify-center shrink-0 shadow-lg">
+              <span className="text-white font-bold text-sm">AC</span>
             </div>
             <div className="min-w-0">
-              <h2 className="font-bold text-xs md:text-sm truncate">Agadir Citoyens</h2>
-              <p className="text-[10px] md:text-xs text-sidebar-muted truncate">Administration</p>
+              <h2 className="font-bold text-sm text-white">Agadir Citoyens</h2>
+              <p className="text-[10px] text-sidebar-muted truncate">Royaume du Maroc</p>
             </div>
+          </div>
+          <div className="bg-sidebar-accent/20 rounded-lg px-3 py-2 border border-sidebar-accent/10">
+            <p className="text-[10px] text-sidebar-muted uppercase tracking-wider">Responsable</p>
+            <p className="text-xs font-semibold text-white">ANAS GUERRABI</p>
           </div>
           <button
             onClick={() => setMobileOpen(false)}
-            className="lg:hidden text-sidebar-muted hover:text-sidebar-foreground p-1"
+            className="absolute top-4 right-4 lg:hidden text-sidebar-muted hover:text-white p-1"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
-        <nav className="flex-1 p-3 md:p-4 space-y-1 overflow-y-auto">
+        <nav className="flex-1 p-3 space-y-0.5 overflow-y-auto">
+          <p className="text-[10px] uppercase tracking-widest text-sidebar-muted/50 px-3 pb-1 pt-2 font-medium">
+            Menu principal
+          </p>
           {navItems.map((item) => {
             const Icon = item.icon
             const isActive = pathname === item.href || (item.href !== "/dashboard" && pathname.startsWith(item.href))
@@ -98,32 +105,35 @@ export function Sidebar() {
                 key={item.href}
                 href={item.href}
                 className={cn(
-                  "flex items-center gap-3 px-3 md:px-4 py-2.5 md:py-3 rounded-lg text-xs md:text-sm font-medium transition-colors",
+                  "flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-medium transition-all",
                   isActive
-                    ? "bg-sidebar-accent/20 text-sidebar-foreground"
-                    : "text-sidebar-muted hover:text-sidebar-foreground hover:bg-sidebar-accent/10"
+                    ? "bg-primary/20 text-white shadow-sm border-l-2 border-primary"
+                    : "text-sidebar-muted hover:text-white hover:bg-white/5"
                 )}
               >
-                <Icon className="w-4 h-4 md:w-5 md:h-5 shrink-0" />
+                <Icon className={cn("w-4 h-4 shrink-0", isActive ? "text-primary" : "")} />
                 <span className="truncate">{item.label}</span>
               </Link>
             )
           })}
         </nav>
 
-        <div className="p-3 md:p-4 border-t border-sidebar-border space-y-1">
+        <div className="p-3 border-t border-sidebar-border space-y-0.5">
+          <p className="text-[10px] uppercase tracking-widest text-sidebar-muted/50 px-3 pb-1 font-medium">
+            Système
+          </p>
           <button
             onClick={toggleTheme}
-            className="flex items-center gap-3 px-3 md:px-4 py-2.5 md:py-3 rounded-lg text-xs md:text-sm font-medium text-sidebar-muted hover:text-sidebar-foreground hover:bg-sidebar-accent/10 w-full transition-colors"
+            className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-medium text-sidebar-muted hover:text-white hover:bg-white/5 w-full transition-all"
           >
-            {theme === "dark" ? <Sun className="w-4 h-4 md:w-5 md:h-5 shrink-0" /> : <Moon className="w-4 h-4 md:w-5 md:h-5 shrink-0" />}
+            {theme === "dark" ? <Sun className="w-4 h-4 shrink-0" /> : <Moon className="w-4 h-4 shrink-0" />}
             <span className="truncate">{theme === "dark" ? "Mode clair" : "Mode sombre"}</span>
           </button>
           <button
             onClick={handleLogout}
-            className="flex items-center gap-3 px-3 md:px-4 py-2.5 md:py-3 rounded-lg text-xs md:text-sm font-medium text-sidebar-muted hover:text-sidebar-foreground hover:bg-sidebar-accent/10 w-full transition-colors"
+            className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-medium text-sidebar-muted hover:text-white hover:bg-white/5 w-full transition-all"
           >
-            <LogOut className="w-4 h-4 md:w-5 md:h-5 shrink-0" />
+            <LogOut className="w-4 h-4 shrink-0" />
             <span className="truncate">Déconnexion</span>
           </button>
         </div>

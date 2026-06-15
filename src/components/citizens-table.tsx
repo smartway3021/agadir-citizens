@@ -41,53 +41,55 @@ export function CitizensTable({ citizens, currentPage, totalPages }: Props) {
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-border">
-              <th className="text-left py-3 px-4 font-medium text-muted">Nom</th>
-              <th className="text-left py-3 px-4 font-medium text-muted">Prénom</th>
-              <th className="text-left py-3 px-4 font-medium text-muted">CIN</th>
-              <th className="text-left py-3 px-4 font-medium text-muted">Téléphone</th>
-              <th className="text-left py-3 px-4 font-medium text-muted">Secteur</th>
-              <th className="text-left py-3 px-4 font-medium text-muted">Sexe</th>
-              <th className="text-left py-3 px-4 font-medium text-muted">Profession</th>
-              <th className="text-left py-3 px-4 font-medium text-muted">Date d&apos;ajout</th>
-              <th className="text-right py-3 px-4 font-medium text-muted">Actions</th>
+              <th className="text-left py-2.5 px-3 font-medium text-muted text-[11px] uppercase tracking-wider">Nom</th>
+              <th className="text-left py-2.5 px-3 font-medium text-muted text-[11px] uppercase tracking-wider">Prénom</th>
+              <th className="text-left py-2.5 px-3 font-medium text-muted text-[11px] uppercase tracking-wider">CIN</th>
+              <th className="text-left py-2.5 px-3 font-medium text-muted text-[11px] uppercase tracking-wider">Téléphone</th>
+              <th className="text-left py-2.5 px-3 font-medium text-muted text-[11px] uppercase tracking-wider">Secteur</th>
+              <th className="text-left py-2.5 px-3 font-medium text-muted text-[11px] uppercase tracking-wider">Sexe</th>
+              <th className="text-left py-2.5 px-3 font-medium text-muted text-[11px] uppercase tracking-wider">Profession</th>
+              <th className="text-left py-2.5 px-3 font-medium text-muted text-[11px] uppercase tracking-wider">Date</th>
+              <th className="text-right py-2.5 px-3 font-medium text-muted text-[11px] uppercase tracking-wider">Actions</th>
             </tr>
           </thead>
           <tbody>
             {citizens.map((citizen) => (
               <tr key={citizen.id} className="border-b border-border hover:bg-hover">
-                <td className="py-3 px-4 font-medium">{citizen.last_name}</td>
-                <td className="py-3 px-4">{citizen.first_name}</td>
-                <td className="py-3 px-4">
+                <td className="py-2.5 px-3 font-medium text-sm">{citizen.last_name}</td>
+                <td className="py-2.5 px-3 text-sm">{citizen.first_name}</td>
+                <td className="py-2.5 px-3">
                   <Badge>{citizen.national_id}</Badge>
                 </td>
-                <td className="py-3 px-4">
+                <td className="py-2.5 px-3 text-xs">
                   {citizen.phone ? (
                     <span className="flex items-center gap-1">
-                      <Phone className="w-3 h-3 text-muted" />
+                      <Phone className="w-3 h-3 text-muted shrink-0" />
                       {citizen.phone}
                     </span>
                   ) : (
                     <span className="text-muted">-</span>
                   )}
                 </td>
-                <td className="py-3 px-4">{citizen.sector}</td>
-                <td className="py-3 px-4">
-                  {citizen.gender === "male" ? "Homme" : "Femme"}
+                <td className="py-2.5 px-3 text-xs">{citizen.sector}</td>
+                <td className="py-2.5 px-3 text-xs">
+                  <span className={`${citizen.gender === "male" ? "text-primary" : "text-accent"} font-medium`}>
+                    {citizen.gender === "male" ? "H" : "F"}
+                  </span>
                 </td>
-                <td className="py-3 px-4">
+                <td className="py-2.5 px-3 text-xs">
                   {citizen.profession ? (
                     <span className="flex items-center gap-1">
-                      <Briefcase className="w-3 h-3 text-muted" />
+                      <Briefcase className="w-3 h-3 text-muted shrink-0" />
                       {citizen.profession}
                     </span>
                   ) : (
                     <span className="text-muted">-</span>
                   )}
                 </td>
-                <td className="py-3 px-4 text-muted">
+                <td className="py-2.5 px-3 text-muted text-xs">
                   {formatDate(citizen.created_at)}
                 </td>
-                <td className="py-3 px-4 text-right">
+                <td className="py-2.5 px-3 text-right">
                   <div className="flex items-center justify-end gap-2">
                     <Link href={`/dashboard/citizens/${citizen.id}`}>
                       <Button variant="ghost" size="sm">

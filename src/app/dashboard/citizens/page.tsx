@@ -26,9 +26,12 @@ export default async function CitizensPage({
   return (
     <div className="space-y-4 md:space-y-6">
       <div>
-        <h1 className="text-xl md:text-2xl font-bold text-foreground">Habitants</h1>
-        <p className="text-muted text-xs md:text-sm mt-0.5">
-          {total} habitant{total > 1 ? "s" : ""} enregistré{total > 1 ? "s" : ""}
+        <div className="flex items-center gap-2">
+          <div className="w-1 h-6 bg-primary rounded-full" />
+          <h1 className="text-xl md:text-2xl font-bold text-foreground">Registre des habitants</h1>
+        </div>
+        <p className="text-muted-foreground text-xs md:text-sm mt-0.5 ml-3">
+          {total} citoyen{total > 1 ? "s" : ""} enregistré{total > 1 ? "s" : ""}
         </p>
       </div>
 

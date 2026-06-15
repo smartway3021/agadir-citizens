@@ -8,6 +8,7 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { Select } from "@/components/ui/select"
 import { Camera, IdCard } from "@/components/camera"
 import { createClient } from "@/lib/supabase/client"
+import { enhanceForOcr } from "@/lib/image-process"
 import {
   ArrowLeft,
   Camera as CameraIcon,
@@ -103,18 +104,24 @@ export default function NewCitizenPage() {
     async (side: "front" | "back", e: React.ChangeEvent<HTMLInputElement>) => {
       const file = e.target.files?.[0]
       if (!file) return
-      const url = URL.createObjectURL(file)
+      const previewUrl = URL.createObjectURL(file)
 
       if (side === "front") {
         setFrontFile(file)
-        setFrontImage(url)
+        setFrontImage(previewUrl)
       } else {
         setBackFile(file)
-        setBackImage(url)
+        setBackImage(previewUrl)
       }
 
-      await autoOcr(url)
-      setStep("form")
+      const reader = new FileReader()
+      reader.onload = async (ev) => {
+        const dataUrl = ev.target?.result as string
+        const enhanced = await enhanceForOcr(dataUrl)
+        await autoOcr(enhanced)
+        setStep("form")
+      }
+      reader.readAsDataURL(file)
     },
     []
   )

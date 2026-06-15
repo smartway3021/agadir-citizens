@@ -6,6 +6,7 @@ import type { Citizen } from "@/lib/types"
 import { formatDate, getAge } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
+import { Badge } from "@/components/ui/badge"
 import { updateCitizenAction, deleteCitizenAction } from "@/app/actions"
 import { CitizenMap } from "@/components/map"
 import { Camera } from "@/components/camera"
@@ -187,7 +188,7 @@ export function CitizenDetail({ citizen }: Props) {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-5">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div className="flex items-center gap-3">
           <Link href="/dashboard/citizens">
@@ -196,11 +197,18 @@ export function CitizenDetail({ citizen }: Props) {
             </Button>
           </Link>
           <div>
-            <h1 className="text-xl md:text-2xl font-bold">
-              {citizen.first_name} {citizen.last_name}
-            </h1>
-            <p className="text-muted text-xs md:text-sm">
-              CIN: {citizen.national_id}
+            <div className="flex items-center gap-2">
+              <h1 className="text-xl md:text-2xl font-bold">
+                {citizen.first_name} {citizen.last_name}
+              </h1>
+              <Badge variant={citizen.gender === "male" ? "default" : "success"}>
+                {citizen.gender === "male" ? "Masculin" : "Féminin"}
+              </Badge>
+            </div>
+            <p className="text-muted-foreground text-xs md:text-sm flex items-center gap-2">
+              <span>CIN: {citizen.national_id}</span>
+              <span className="w-1 h-1 bg-muted rounded-full" />
+              <span>Secteur: {citizen.sector}</span>
             </p>
           </div>
         </div>
@@ -235,7 +243,10 @@ export function CitizenDetail({ citizen }: Props) {
         <div className="lg:col-span-2 space-y-4 md:space-y-6">
           <Card>
             <CardHeader>
-              <h3 className="font-semibold">Identité</h3>
+              <div className="flex items-center gap-2">
+                <div className="w-1 h-4 bg-primary rounded-full" />
+                <h3 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">Identité</h3>
+              </div>
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-6">
@@ -254,10 +265,13 @@ export function CitizenDetail({ citizen }: Props) {
 
           <Card>
             <CardHeader>
-              <h3 className="font-semibold">Contact & Profession</h3>
+              <div className="flex items-center gap-2">
+                <div className="w-1 h-4 bg-accent rounded-full" />
+                <h3 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">Contact & Profession</h3>
+              </div>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-6">
                 <Field label="Téléphone" value={citizen.phone} field="phone" {...editProps} />
                 <Field label="Profession" value={citizen.profession} field="profession" {...editProps} />
                 <Field label="Situation familiale" value={{
@@ -269,10 +283,10 @@ export function CitizenDetail({ citizen }: Props) {
 
           <Card>
             <CardHeader>
-              <h3 className="font-semibold flex items-center gap-2">
+              <div className="flex items-center gap-2">
                 <MapPin className="w-4 h-4 text-primary" />
-                Localisation
-              </h3>
+                <h3 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">Localisation</h3>
+              </div>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid grid-cols-1 gap-4 md:gap-6">
@@ -287,7 +301,10 @@ export function CitizenDetail({ citizen }: Props) {
         <div className="space-y-4 md:space-y-6">
           <Card>
             <CardHeader>
-              <h3 className="font-semibold">Pièces d&apos;identité</h3>
+              <div className="flex items-center gap-2">
+                <div className="w-1 h-4 bg-primary rounded-full" />
+                <h3 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">Pièces d&apos;identité</h3>
+              </div>
             </CardHeader>
             <CardContent className="space-y-4">
               <div>
