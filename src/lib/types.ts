@@ -30,11 +30,15 @@ export interface DashboardStats {
 export interface OcrResult {
   first_name: string
   last_name: string
+  father_name: string
+  mother_name: string
   national_id: string
   birth_date: string
+  birth_place: string
   address: string
   sector: string
   gender: "male" | "female"
+  rawText: string
 }
 
 export interface ReportFilters {

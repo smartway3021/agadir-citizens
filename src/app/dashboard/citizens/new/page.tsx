@@ -8,7 +8,7 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { Select } from "@/components/ui/select"
 import { Camera, IdCard } from "@/components/camera"
 import { createClient } from "@/lib/supabase/client"
-import { enhanceForOcr } from "@/lib/image-process"
+import { runOcr } from "@/lib/ocr"
 import {
   ArrowLeft,
   Camera as CameraIcon,
@@ -49,6 +49,7 @@ export default function NewCitizenPage() {
     marital_status: "single" as "single" | "married" | "divorced" | "widowed",
     nationality: "Marocaine",
   })
+  const [mode, setMode] = useState<"gallery" | "camera">("gallery")
   const [showCamera, setShowCamera] = useState<"front" | "back" | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const backFileInputRef = useRef<HTMLInputElement>(null)
@@ -56,21 +57,19 @@ export default function NewCitizenPage() {
   async function autoOcr(image: string) {
     setOcrLoading(true)
     try {
-      const res = await fetch("/api/ocr", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ image }),
-      })
-      if (res.ok) {
-        const data = await res.json()
-        setFormData((prev) => ({
-          ...prev,
-          ...data,
-        }))
-      }
-    } catch {
-      // OCR failed silently
-    }
+      const data = await runOcr(image)
+      setFormData((prev) => ({
+        ...prev,
+        first_name: data.first_name || prev.first_name,
+        last_name: data.last_name || prev.last_name,
+        father_name: data.father_name || prev.father_name,
+        mother_name: data.mother_name || prev.mother_name,
+        national_id: data.national_id || prev.national_id,
+        birth_date: data.birth_date || prev.birth_date,
+        address: data.address || prev.address,
+        gender: data.gender || prev.gender,
+      }))
+    } catch {}
     setOcrLoading(false)
   }
 
@@ -88,14 +87,14 @@ export default function NewCitizenPage() {
       if (side === "front") {
         setFrontFile(file)
         setFrontImage(previewUrl)
+        setShowCamera(null)
+        await autoOcr(imageSrc)
+        setStep("form")
       } else {
         setBackFile(file)
         setBackImage(previewUrl)
+        setShowCamera(null)
       }
-      setShowCamera(null)
-
-      await autoOcr(imageSrc)
-      setStep("form")
     },
     []
   )
@@ -109,19 +108,17 @@ export default function NewCitizenPage() {
       if (side === "front") {
         setFrontFile(file)
         setFrontImage(previewUrl)
+        const reader = new FileReader()
+        reader.onload = async (ev) => {
+          const dataUrl = ev.target?.result as string
+          await autoOcr(dataUrl)
+          setStep("form")
+        }
+        reader.readAsDataURL(file)
       } else {
         setBackFile(file)
         setBackImage(previewUrl)
       }
-
-      const reader = new FileReader()
-      reader.onload = async (ev) => {
-        const dataUrl = ev.target?.result as string
-        const enhanced = await enhanceForOcr(dataUrl)
-        await autoOcr(enhanced)
-        setStep("form")
-      }
-      reader.readAsDataURL(file)
     },
     []
   )
@@ -230,127 +227,123 @@ export default function NewCitizenPage() {
         <CardContent className="px-4 md:px-6">
           {step === "scan" && (
             <div className="space-y-4 md:space-y-6">
+              <div className="bg-hover rounded-xl p-3 md:p-4">
+                <p className="text-xs font-medium text-muted mb-2 uppercase tracking-wider">Mode de capture</p>
+                <div className="grid grid-cols-2 gap-2 md:gap-3">
+                  <button
+                    onClick={() => setMode("gallery")}
+                    className={`flex items-center justify-center gap-2 rounded-lg py-3 px-4 text-sm font-medium border-2 transition-all ${
+                      mode === "gallery"
+                        ? "border-primary bg-primary/10 text-primary"
+                        : "border-border bg-card text-foreground hover:border-primary/50"
+                    }`}
+                  >
+                    <Upload className="w-5 h-5" />
+                    Galerie
+                  </button>
+                  <button
+                    onClick={() => setMode("camera")}
+                    className={`flex items-center justify-center gap-2 rounded-lg py-3 px-4 text-sm font-medium border-2 transition-all ${
+                      mode === "camera"
+                        ? "border-primary bg-primary/10 text-primary"
+                        : "border-border bg-card text-foreground hover:border-primary/50"
+                    }`}
+                  >
+                    <CameraIcon className="w-5 h-5" />
+                    Appareil photo
+                  </button>
+                </div>
+              </div>
+
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4">
                 <div
-                  className={`border-2 border-dashed rounded-xl p-4 md:p-8 text-center cursor-pointer transition-colors ${frontImage ? "border-success bg-success/5" : "border-border hover:border-primary"}`}
-                  onClick={() => !frontImage && handleCapture("front")}
+                  className={`border-2 border-dashed rounded-xl p-4 md:p-6 text-center transition-colors ${frontImage ? "border-success bg-success/5" : "border-border"}`}
                 >
                   {frontImage ? (
-                    <div className="space-y-2 md:space-y-3">
-                      <img
-                        src={frontImage}
-                        alt="Recto"
-                        className="max-h-24 md:max-h-36 mx-auto rounded-lg"
-                      />
-                      <p className="text-xs md:text-sm text-success font-medium">
-                        Recto scanné
-                      </p>
+                    <div className="space-y-3">
+                      <img src={frontImage} alt="Recto" className="max-h-28 md:max-h-36 mx-auto rounded-lg" />
+                      <p className="text-xs md:text-sm text-success font-medium">Recto scanné</p>
                       <div className="flex gap-2 justify-center">
-                        <Button variant="ghost" size="sm" onClick={() => fileInputRef.current?.click()}>
-                          <Upload className="w-3 h-3 md:w-4 md:h-4 mr-1" />
-                          Galerie
-                        </Button>
-                        <Button variant="ghost" size="sm" onClick={() => handleCapture("front")}>
-                          <CameraIcon className="w-3 h-3 md:w-4 md:h-4 mr-1" />
-                          Reprendre
-                        </Button>
+                        {mode === "gallery" ? (
+                          <Button variant="ghost" size="sm" onClick={() => fileInputRef.current?.click()}>
+                            <Upload className="w-3 h-3 mr-1" /> Changer
+                          </Button>
+                        ) : (
+                          <Button variant="ghost" size="sm" onClick={() => handleCapture("front")}>
+                            <CameraIcon className="w-3 h-3 mr-1" /> Reprendre
+                          </Button>
+                        )}
                       </div>
                     </div>
                   ) : (
-                    <div className="space-y-2 md:space-y-3 py-4 md:py-6">
+                    <div className="space-y-3 py-4 md:py-6">
                       <div className="w-12 h-12 md:w-16 md:h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto">
                         <IdCard className="w-6 h-6 md:w-8 md:h-8 text-primary" />
                       </div>
                       <p className="font-medium text-sm md:text-base">Recto carte d&apos;identité</p>
-                      <p className="text-xs md:text-sm text-muted">
-                        Prenez une photo ou importez
-                      </p>
-                      <div className="flex flex-col sm:flex-row gap-2 justify-center mt-2">
+                      <p className="text-xs text-muted">(NOM, PRÉNOM, PÈRE, MÈRE, CIN, date, sexe, lieu)</p>
+                      {mode === "gallery" ? (
                         <Button onClick={() => fileInputRef.current?.click()} size="sm">
                           <Upload className="w-4 h-4 mr-1" />
-                          Importer de la galerie
+                          Choisir dans la galerie
                         </Button>
-                        <Button variant="secondary" size="sm" onClick={() => handleCapture("front")}>
+                      ) : (
+                        <Button onClick={() => handleCapture("front")} size="sm">
                           <CameraIcon className="w-4 h-4 mr-1" />
-                          Scanner
+                          Prendre en photo
                         </Button>
-                      </div>
+                      )}
                     </div>
                   )}
-                  <input
-                    ref={fileInputRef}
-                    type="file"
-                    accept="image/*"
-                    capture="environment"
-                    className="hidden"
-                    onChange={(e) => handleFileUpload("front", e)}
-                  />
+                  <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={(e) => handleFileUpload("front", e)} />
                 </div>
 
                 <div
-                  className={`border-2 border-dashed rounded-xl p-4 md:p-8 text-center cursor-pointer transition-colors ${backImage ? "border-success bg-success/5" : "border-border hover:border-primary"}`}
-                  onClick={() => !backImage && handleCapture("back")}
+                  className={`border-2 border-dashed rounded-xl p-4 md:p-6 text-center transition-colors ${backImage ? "border-success bg-success/5" : "border-border"}`}
                 >
                   {backImage ? (
-                    <div className="space-y-2 md:space-y-3">
-                      <img
-                        src={backImage}
-                        alt="Verso"
-                        className="max-h-24 md:max-h-36 mx-auto rounded-lg"
-                      />
-                      <p className="text-xs md:text-sm text-success font-medium">
-                        Verso scanné
-                      </p>
+                    <div className="space-y-3">
+                      <img src={backImage} alt="Verso" className="max-h-28 md:max-h-36 mx-auto rounded-lg" />
+                      <p className="text-xs md:text-sm text-success font-medium">Verso scanné</p>
                       <div className="flex gap-2 justify-center">
-                        <Button variant="ghost" size="sm" onClick={() => backFileInputRef.current?.click()}>
-                          <Upload className="w-3 h-3 md:w-4 md:h-4 mr-1" />
-                          Galerie
-                        </Button>
-                        <Button variant="ghost" size="sm" onClick={() => handleCapture("back")}>
-                          <CameraIcon className="w-3 h-3 md:w-4 md:h-4 mr-1" />
-                          Reprendre
-                        </Button>
+                        {mode === "gallery" ? (
+                          <Button variant="ghost" size="sm" onClick={() => backFileInputRef.current?.click()}>
+                            <Upload className="w-3 h-3 mr-1" /> Changer
+                          </Button>
+                        ) : (
+                          <Button variant="ghost" size="sm" onClick={() => handleCapture("back")}>
+                            <CameraIcon className="w-3 h-3 mr-1" /> Reprendre
+                          </Button>
+                        )}
                       </div>
                     </div>
                   ) : (
-                    <div className="space-y-2 md:space-y-3 py-4 md:py-6">
+                    <div className="space-y-3 py-4 md:py-6">
                       <div className="w-12 h-12 md:w-16 md:h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto">
                         <IdCard className="w-6 h-6 md:w-8 md:h-8 text-primary" />
                       </div>
                       <p className="font-medium text-sm md:text-base">Verso carte d&apos;identité</p>
-                      <p className="text-xs md:text-sm text-muted">
-                        Prenez une photo ou importez
-                      </p>
-                      <div className="flex flex-col sm:flex-row gap-2 justify-center mt-2">
+                      <p className="text-xs text-muted">(Adresse)</p>
+                      {mode === "gallery" ? (
                         <Button onClick={() => backFileInputRef.current?.click()} size="sm">
                           <Upload className="w-4 h-4 mr-1" />
-                          Importer de la galerie
+                          Choisir dans la galerie
                         </Button>
-                        <Button variant="secondary" size="sm" onClick={() => handleCapture("back")}>
+                      ) : (
+                        <Button onClick={() => handleCapture("back")} size="sm">
                           <CameraIcon className="w-4 h-4 mr-1" />
-                          Scanner
+                          Prendre en photo
                         </Button>
-                      </div>
+                      )}
                     </div>
                   )}
-                  <input
-                    ref={backFileInputRef}
-                    type="file"
-                    accept="image/*"
-                    capture="environment"
-                    className="hidden"
-                    onChange={(e) => handleFileUpload("back", e)}
-                  />
+                  <input ref={backFileInputRef} type="file" accept="image/*" className="hidden" onChange={(e) => handleFileUpload("back", e)} />
                 </div>
               </div>
 
               {(frontImage || backImage) && (
                 <div className="text-center">
-                  <Button
-                    size="lg"
-                    className="w-full sm:w-auto"
-                    onClick={() => setStep("form")}
-                  >
+                  <Button size="lg" className="w-full sm:w-auto" onClick={() => setStep("form")}>
                     <Check className="w-5 h-5 mr-2" />
                     Continuer vers le formulaire
                   </Button>
@@ -364,7 +357,7 @@ export default function NewCitizenPage() {
               {ocrLoading && (
                 <div className="flex items-center gap-3 bg-primary/10 rounded-lg px-4 py-3 text-sm text-primary">
                   <Loader2 className="w-5 h-5 animate-spin shrink-0" />
-                  Extraction OCR en cours...
+                  Extraction OCR en cours... (téléchargement Tesseract.js)
                 </div>
               )}
 
