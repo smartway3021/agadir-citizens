@@ -83,7 +83,7 @@ export function Sidebar() {
           </div>
           <div className="bg-sidebar-accent/20 rounded-lg px-3 py-2 border border-sidebar-accent/10">
             <p className="text-[10px] text-sidebar-muted uppercase tracking-wider">Responsable</p>
-            <p className="text-xs font-semibold text-white">ANAS GUERRABI</p>
+            <p className="text-xs font-semibold text-white">ANASS GUERRABI</p>
           </div>
           <button
             onClick={() => setMobileOpen(false)}

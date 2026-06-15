@@ -97,7 +97,7 @@ export default function LoginPage() {
               {loading ? "Connexion..." : "Se connecter"}
             </Button>
             <p className="text-center text-[10px] text-muted pt-2 border-t border-border">
-              Responsable : ANAS GUERRABI
+              Responsable : ANASS GUERRABI
             </p>
           </form>
         </CardContent>

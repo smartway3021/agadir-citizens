@@ -25,7 +25,7 @@ export default function GlobalError({
             Réessayer
           </button>
           <p className="text-[10px] text-[#9ca3af] pt-2 border-t border-[#e5e0d8]">
-            Responsable : ANAS GUERRABI
+            Responsable : ANASS GUERRABI
           </p>
         </div>
       </body>

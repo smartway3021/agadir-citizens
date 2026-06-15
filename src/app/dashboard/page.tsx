@@ -257,7 +257,7 @@ export default async function DashboardPage() {
           <Shield className="w-3 h-3" />
           Système sécurisé — Registre administratif municipal
         </span>
-        <span>Responsable : ANAS GUERRABI</span>
+        <span>Responsable : ANASS GUERRABI</span>
       </div>
     </div>
   )

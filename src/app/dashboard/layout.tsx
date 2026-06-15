@@ -28,7 +28,7 @@ export default async function DashboardLayout({
       <footer className="hidden lg:block lg:ml-64 border-t border-border bg-card">
         <div className="px-6 py-2 flex items-center justify-between text-[10px] text-muted">
           <span>Agadir Citoyens — Registre administratif municipal</span>
-          <span>Responsable : ANAS GUERRABI | © {new Date().getFullYear()} — Tous droits réservés</span>
+          <span>Responsable : ANASS GUERRABI | © {new Date().getFullYear()} — Tous droits réservés</span>
         </div>
       </footer>
     </div>
