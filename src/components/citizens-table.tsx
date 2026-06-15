@@ -204,7 +204,7 @@ export function CitizensTable({ citizens, currentPage, totalPages }: Props) {
                 </td>
                 <td className="py-2.5 px-3 text-xs">{citizen.sector}</td>
                 <td className="py-2.5 px-3 text-xs">
-                  <span className={`${citizen.gender === "male" ? "text-primary" : "text-accent"} font-medium`}>
+                  <span className={`${citizen.gender === "male" ? "text-blue-600 dark:text-blue-400" : "text-pink-500 dark:text-pink-400"} font-medium`}>
                     {citizen.gender === "male" ? "H" : "F"}
                   </span>
                 </td>

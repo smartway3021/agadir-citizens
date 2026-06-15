@@ -217,7 +217,7 @@ export default async function DashboardPage() {
             <CardContent>
               <div className="flex items-center gap-6 py-2">
                 <div className="text-center flex-1">
-                  <div className="w-16 h-16 bg-gradient-to-br from-primary to-primary-dark rounded-xl flex items-center justify-center mx-auto mb-2 shadow-sm">
+                  <div className="w-16 h-16 bg-gradient-to-br from-blue-600 to-blue-800 rounded-xl flex items-center justify-center mx-auto mb-2 shadow-sm">
                     <span className="text-xl font-bold text-white">
                       {stats.by_gender.male}
                     </span>
@@ -225,7 +225,7 @@ export default async function DashboardPage() {
                   <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Hommes</p>
                 </div>
                 <div className="text-center flex-1">
-                  <div className="w-16 h-16 bg-gradient-to-br from-accent to-accent-light rounded-xl flex items-center justify-center mx-auto mb-2 shadow-sm">
+                  <div className="w-16 h-16 bg-gradient-to-br from-pink-500 to-pink-400 rounded-xl flex items-center justify-center mx-auto mb-2 shadow-sm">
                     <span className="text-xl font-bold text-white">
                       {stats.by_gender.female}
                     </span>
@@ -237,11 +237,11 @@ export default async function DashboardPage() {
                 <div className="mt-3 pt-3 border-t border-border">
                   <div className="w-full h-2 bg-hover rounded-full overflow-hidden flex">
                     <div
-                      className="h-full bg-primary rounded-l-full transition-all"
+                      className="h-full bg-blue-600 rounded-l-full transition-all"
                       style={{ width: `${(stats.by_gender.male / stats.total_citizens) * 100}%` }}
                     />
                     <div
-                      className="h-full bg-accent rounded-r-full transition-all"
+                      className="h-full bg-pink-500 rounded-r-full transition-all"
                       style={{ width: `${(stats.by_gender.female / stats.total_citizens) * 100}%` }}
                     />
                   </div>

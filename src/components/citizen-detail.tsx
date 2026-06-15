@@ -201,7 +201,7 @@ export function CitizenDetail({ citizen }: Props) {
               <h1 className="text-xl md:text-2xl font-bold">
                 {citizen.first_name} {citizen.last_name}
               </h1>
-              <Badge variant={citizen.gender === "male" ? "default" : "success"}>
+              <Badge className={citizen.gender === "male" ? "bg-blue-600 text-white border-blue-700" : "bg-pink-500 text-white border-pink-600"}>
                 {citizen.gender === "male" ? "Masculin" : "Féminin"}
               </Badge>
             </div>
