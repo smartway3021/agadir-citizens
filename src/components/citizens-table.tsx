@@ -54,7 +54,7 @@ export function CitizensTable({ citizens, currentPage, totalPages }: Props) {
           </thead>
           <tbody>
             {citizens.map((citizen) => (
-              <tr key={citizen.id} className="border-b border-border hover:bg-gray-50 dark:hover:bg-gray-800/50">
+              <tr key={citizen.id} className="border-b border-border hover:bg-hover">
                 <td className="py-3 px-4 font-medium">{citizen.last_name}</td>
                 <td className="py-3 px-4">{citizen.first_name}</td>
                 <td className="py-3 px-4">
@@ -123,7 +123,7 @@ export function CitizensTable({ citizens, currentPage, totalPages }: Props) {
             {currentPage > 1 && (
               <Link
                 href={`/dashboard/citizens?page=${currentPage - 1}`}
-                className="px-4 py-2 text-sm rounded-lg border border-border hover:bg-gray-50"
+                className="px-4 py-2 text-sm rounded-lg border border-border bg-card text-foreground hover:bg-hover"
               >
                 Précédent
               </Link>
@@ -131,7 +131,7 @@ export function CitizensTable({ citizens, currentPage, totalPages }: Props) {
             {currentPage < totalPages && (
               <Link
                 href={`/dashboard/citizens?page=${currentPage + 1}`}
-                className="px-4 py-2 text-sm rounded-lg border border-border hover:bg-gray-50"
+                className="px-4 py-2 text-sm rounded-lg border border-border bg-card text-foreground hover:bg-hover"
               >
                 Suivant
               </Link>

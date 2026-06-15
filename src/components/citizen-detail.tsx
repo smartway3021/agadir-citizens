@@ -188,7 +188,7 @@ export function CitizenDetail({ citizen }: Props) {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div className="flex items-center gap-3">
           <Link href="/dashboard/citizens">
             <Button variant="ghost" size="sm">
@@ -196,10 +196,10 @@ export function CitizenDetail({ citizen }: Props) {
             </Button>
           </Link>
           <div>
-            <h1 className="text-2xl font-bold">
+            <h1 className="text-xl md:text-2xl font-bold">
               {citizen.first_name} {citizen.last_name}
             </h1>
-            <p className="text-muted text-sm">
+            <p className="text-muted text-xs md:text-sm">
               CIN: {citizen.national_id}
             </p>
           </div>
@@ -231,14 +231,14 @@ export function CitizenDetail({ citizen }: Props) {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2 space-y-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6">
+        <div className="lg:col-span-2 space-y-4 md:space-y-6">
           <Card>
             <CardHeader>
               <h3 className="font-semibold">Identité</h3>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-6">
                 <Field label="Nom" value={citizen.last_name} field="last_name" {...editProps} />
                 <Field label="Prénom" value={citizen.first_name} field="first_name" {...editProps} />
                 <Field label="Nom du père" value={citizen.father_name} field="father_name" {...editProps} />
@@ -275,10 +275,8 @@ export function CitizenDetail({ citizen }: Props) {
               </h3>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="grid grid-cols-2 gap-6">
-                <div className="col-span-2">
-                  <Field label="Adresse" value={citizen.address} field="address" {...editProps} />
-                </div>
+              <div className="grid grid-cols-1 gap-4 md:gap-6">
+                <Field label="Adresse" value={citizen.address} field="address" {...editProps} />
                 <Field label="Secteur" value={citizen.sector} field="sector" {...editProps} />
               </div>
               <CitizenMap address={citizen.address} sector={citizen.sector} />
@@ -286,7 +284,7 @@ export function CitizenDetail({ citizen }: Props) {
           </Card>
         </div>
 
-        <div className="space-y-6">
+        <div className="space-y-4 md:space-y-6">
           <Card>
             <CardHeader>
               <h3 className="font-semibold">Pièces d&apos;identité</h3>

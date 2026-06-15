@@ -44,7 +44,7 @@ export function CitizenMap({ address, sector }: Props) {
 
   if (!mounted) {
     return (
-      <div className="h-64 bg-gray-100 rounded-lg flex items-center justify-center">
+      <div className="h-64 bg-hover rounded-lg flex items-center justify-center">
         <p className="text-muted text-sm">Chargement de la carte...</p>
       </div>
     )

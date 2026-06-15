@@ -76,10 +76,10 @@ export default function ReportsPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 md:space-y-6">
       <div>
-        <h1 className="text-2xl font-bold">Rapports et exports</h1>
-        <p className="text-muted text-sm mt-1">
+        <h1 className="text-xl md:text-2xl font-bold">Rapports et exports</h1>
+        <p className="text-muted text-xs md:text-sm mt-0.5">
           Générez des rapports PDF officiels et exportez les données en Excel
         </p>
       </div>
@@ -105,7 +105,7 @@ export default function ReportsPage() {
                 <Calendar className="w-4 h-4 inline mr-1" />
                 Période
               </p>
-              <div className="grid grid-cols-2 gap-2">
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2">
                 {[
                   { value: "all", label: "Toute la base" },
                   { value: "today", label: "Aujourd'hui" },
@@ -129,7 +129,7 @@ export default function ReportsPage() {
             </div>
 
             {period === "custom" && (
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <label className="block text-sm font-medium mb-1">Date début</label>
                   <input
@@ -215,7 +215,7 @@ export default function ReportsPage() {
                 <Calendar className="w-4 h-4 inline mr-1" />
                 Filtre par date (optionnel)
               </p>
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <label className="block text-sm font-medium mb-1">Date début</label>
                   <input
@@ -252,7 +252,7 @@ export default function ReportsPage() {
               Exporter en Excel
             </Button>
 
-            <div className="bg-gray-50 dark:bg-gray-800/50 rounded-lg p-3">
+            <div className="bg-hover rounded-lg p-3">
               <p className="text-xs text-muted">
                 Colonnes: Nom, Prénom, Père, Mère, CIN, Date naiss., Téléphone, Profession, Situation, Nationalité, Adresse, Secteur, Sexe, Date d&apos;ajout
               </p>

@@ -12,9 +12,9 @@ import {
   ArrowLeft,
   Camera as CameraIcon,
   Upload,
-  Scan,
   Check,
   ChevronRight,
+  Loader2,
 } from "lucide-react"
 import Link from "next/link"
 
@@ -26,8 +26,9 @@ const sectors = [
 export default function NewCitizenPage() {
   const router = useRouter()
   const supabase = createClient()
-  const [step, setStep] = useState<"scan" | "preview" | "form">("scan")
+  const [step, setStep] = useState<"scan" | "form">("scan")
   const [loading, setLoading] = useState(false)
+  const [ocrLoading, setOcrLoading] = useState(false)
   const [frontImage, setFrontImage] = useState<string | null>(null)
   const [backImage, setBackImage] = useState<string | null>(null)
   const [frontFile, setFrontFile] = useState<File | null>(null)
@@ -51,68 +52,72 @@ export default function NewCitizenPage() {
   const fileInputRef = useRef<HTMLInputElement>(null)
   const backFileInputRef = useRef<HTMLInputElement>(null)
 
-  const handleCapture = useCallback((side: "front" | "back") => {
-    setShowCamera(side)
-  }, [])
-
-  const handleCameraCapture = useCallback(
-    (side: "front" | "back", imageSrc: string) => {
-      if (side === "front") {
-        setFrontImage(imageSrc)
-      } else {
-        setBackImage(imageSrc)
-      }
-      setShowCamera(null)
-    },
-    []
-  )
-
-  const handleFileUpload = useCallback(
-    (side: "front" | "back", e: React.ChangeEvent<HTMLInputElement>) => {
-      const file = e.target.files?.[0]
-      if (!file) return
-
-      if (side === "front") {
-        setFrontFile(file)
-        setFrontImage(URL.createObjectURL(file))
-      } else {
-        setBackFile(file)
-        setBackImage(URL.createObjectURL(file))
-      }
-    },
-    []
-  )
-
-  async function handleOcrExtract() {
-    setLoading(true)
+  async function autoOcr(image: string) {
+    setOcrLoading(true)
     try {
-      const imageData = frontImage || backImage
-      if (!imageData) {
-        setLoading(false)
-        return
-      }
-
       const res = await fetch("/api/ocr", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ image: imageData }),
+        body: JSON.stringify({ image }),
       })
-
       if (res.ok) {
         const data = await res.json()
         setFormData((prev) => ({
           ...prev,
           ...data,
         }))
-        setStep("form")
-      } else {
-        setStep("form")
       }
     } catch {
-      setStep("form")
+      // OCR failed silently
     }
-    setLoading(false)
+    setOcrLoading(false)
   }
+
+  const handleCapture = useCallback((side: "front" | "back") => {
+    setShowCamera(side)
+  }, [])
+
+  const handleCameraCapture = useCallback(
+    async (side: "front" | "back", imageSrc: string) => {
+      const res = await fetch(imageSrc)
+      const blob = await res.blob()
+      const file = new File([blob], `card-${side}-${Date.now()}.jpg`, { type: "image/jpeg" })
+      const previewUrl = URL.createObjectURL(file)
+
+      if (side === "front") {
+        setFrontFile(file)
+        setFrontImage(previewUrl)
+      } else {
+        setBackFile(file)
+        setBackImage(previewUrl)
+      }
+      setShowCamera(null)
+
+      await autoOcr(imageSrc)
+      setStep("form")
+    },
+    []
+  )
+
+  const handleFileUpload = useCallback(
+    async (side: "front" | "back", e: React.ChangeEvent<HTMLInputElement>) => {
+      const file = e.target.files?.[0]
+      if (!file) return
+      const url = URL.createObjectURL(file)
+
+      if (side === "front") {
+        setFrontFile(file)
+        setFrontImage(url)
+      } else {
+        setBackFile(file)
+        setBackImage(url)
+      }
+
+      await autoOcr(url)
+      setStep("form")
+    },
+    []
+  )
 
   async function uploadImage(file: File, path: string): Promise<string> {
     const { data } = await supabase.storage
@@ -175,101 +180,90 @@ export default function NewCitizenPage() {
   }
 
   return (
-    <div className="space-y-6 max-w-3xl mx-auto">
-      <div className="flex items-center gap-3">
+    <div className="space-y-4 md:space-y-6 max-w-3xl mx-auto px-4 md:px-0">
+      <div className="flex items-center gap-3 pt-2">
         <Link href="/dashboard/citizens">
           <Button variant="ghost" size="sm">
             <ArrowLeft className="w-5 h-5" />
           </Button>
         </Link>
         <div>
-          <h1 className="text-2xl font-bold">Nouveau habitant</h1>
-          <p className="text-muted text-sm mt-1">
-            Scannez la carte d&apos;identité ou saisissez les données
+          <h1 className="text-xl md:text-2xl font-bold">Nouveau habitant</h1>
+          <p className="text-muted text-xs md:text-sm mt-0.5">
+            Scannez la carte d&apos;identité pour remplissage automatique
           </p>
         </div>
       </div>
 
       <Card>
-        <CardHeader>
-          <div className="flex items-center gap-2">
-            <div className="flex items-center gap-2">
-              <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${step === "scan" ? "bg-primary text-white" : "bg-success text-white"}`}>
-                {step === "scan" ? "1" : <Check className="w-4 h-4" />}
+        <CardHeader className="px-4 md:px-6">
+          <div className="flex items-center gap-1 md:gap-2 text-xs md:text-sm overflow-x-auto">
+            <div className="flex items-center gap-1 md:gap-2 shrink-0">
+              <div className={`w-7 h-7 md:w-8 md:h-8 rounded-full flex items-center justify-center text-xs md:text-sm font-bold ${step === "scan" ? "bg-primary text-white" : "bg-success text-white"}`}>
+                {step === "scan" ? "1" : <Check className="w-3 h-3 md:w-4 md:h-4" />}
               </div>
-              <span className="text-sm font-medium">Scan</span>
+              <span className="font-medium text-xs md:text-sm">Scan</span>
             </div>
-            <ChevronRight className="w-4 h-4 text-muted" />
-            <div className="flex items-center gap-2">
-              <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${step === "preview" ? "bg-primary text-white" : step === "form" ? "bg-success text-white" : "bg-gray-200 text-gray-400"}`}>
-                {step === "preview" || step === "form" ? (step === "form" ? <Check className="w-4 h-4" /> : "2") : "2"}
+            <ChevronRight className="w-3 h-3 md:w-4 md:h-4 text-muted shrink-0" />
+            <div className="flex items-center gap-1 md:gap-2 shrink-0">
+              <div className={`w-7 h-7 md:w-8 md:h-8 rounded-full flex items-center justify-center text-xs md:text-sm font-bold ${step === "form" ? "bg-primary text-white" : "bg-muted/20 text-muted"}`}>
+                {step === "form" ? (ocrLoading ? "..." : <Check className="w-3 h-3 md:w-4 md:h-4" />) : "2"}
               </div>
-              <span className="text-sm font-medium">Vérification</span>
+              <span className="font-medium text-xs md:text-sm">Formulaire</span>
             </div>
-            <ChevronRight className="w-4 h-4 text-muted" />
-            <div className="flex items-center gap-2">
-              <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${step === "form" ? "bg-primary text-white" : "bg-gray-200 text-gray-400"}`}>
+            <ChevronRight className="w-3 h-3 md:w-4 md:h-4 text-muted shrink-0" />
+            <div className="flex items-center gap-1 md:gap-2 shrink-0">
+              <div className={`w-7 h-7 md:w-8 md:h-8 rounded-full flex items-center justify-center text-xs md:text-sm font-bold ${step === "form" && !ocrLoading ? "bg-primary text-white" : "bg-muted/20 text-muted"}`}>
                 3
               </div>
-              <span className="text-sm font-medium">Sauvegarde</span>
+              <span className="font-medium text-xs md:text-sm">Sauvegarde</span>
             </div>
           </div>
         </CardHeader>
-        <CardContent>
+        <CardContent className="px-4 md:px-6">
           {step === "scan" && (
-            <div className="space-y-6">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="space-y-4 md:space-y-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4">
                 <div
-                  className={`border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition-colors ${frontImage ? "border-success bg-success/5" : "border-border hover:border-primary"}`}
+                  className={`border-2 border-dashed rounded-xl p-4 md:p-8 text-center cursor-pointer transition-colors ${frontImage ? "border-success bg-success/5" : "border-border hover:border-primary"}`}
+                  onClick={() => !frontImage && handleCapture("front")}
                 >
                   {frontImage ? (
-                    <div className="space-y-3">
+                    <div className="space-y-2 md:space-y-3">
                       <img
                         src={frontImage}
                         alt="Recto"
-                        className="max-h-40 mx-auto rounded-lg"
+                        className="max-h-24 md:max-h-36 mx-auto rounded-lg"
                       />
-                      <p className="text-sm text-success font-medium">
+                      <p className="text-xs md:text-sm text-success font-medium">
                         Recto scanné
                       </p>
                       <div className="flex gap-2 justify-center">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleCapture("front")}
-                        >
-                          <CameraIcon className="w-4 h-4 mr-1" />
+                        <Button variant="ghost" size="sm" onClick={() => handleCapture("front")}>
+                          <CameraIcon className="w-3 h-3 md:w-4 md:h-4 mr-1" />
                           Reprendre
                         </Button>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => fileInputRef.current?.click()}
-                        >
-                          <Upload className="w-4 h-4 mr-1" />
+                        <Button variant="ghost" size="sm" onClick={() => fileInputRef.current?.click()}>
+                          <Upload className="w-3 h-3 md:w-4 md:h-4 mr-1" />
                           Changer
                         </Button>
                       </div>
                     </div>
                   ) : (
-                    <div className="space-y-3">
-                      <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto">
-                        <IdCard className="w-8 h-8 text-primary" />
+                    <div className="space-y-2 md:space-y-3 py-4 md:py-6">
+                      <div className="w-12 h-12 md:w-16 md:h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto">
+                        <IdCard className="w-6 h-6 md:w-8 md:h-8 text-primary" />
                       </div>
-                      <p className="font-medium">Recto carte d&apos;identité</p>
-                      <p className="text-sm text-muted">
+                      <p className="font-medium text-sm md:text-base">Recto carte d&apos;identité</p>
+                      <p className="text-xs md:text-sm text-muted">
                         Prenez une photo ou importez
                       </p>
-                      <div className="flex gap-2 justify-center">
+                      <div className="flex flex-col sm:flex-row gap-2 justify-center mt-2">
                         <Button onClick={() => handleCapture("front")} size="sm">
                           <CameraIcon className="w-4 h-4 mr-1" />
                           Scanner
                         </Button>
-                        <Button
-                          variant="secondary"
-                          size="sm"
-                          onClick={() => fileInputRef.current?.click()}
-                        >
+                        <Button variant="secondary" size="sm" onClick={() => fileInputRef.current?.click()}>
                           <Upload className="w-4 h-4 mr-1" />
                           Importer
                         </Button>
@@ -286,56 +280,45 @@ export default function NewCitizenPage() {
                 </div>
 
                 <div
-                  className={`border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition-colors ${backImage ? "border-success bg-success/5" : "border-border hover:border-primary"}`}
+                  className={`border-2 border-dashed rounded-xl p-4 md:p-8 text-center cursor-pointer transition-colors ${backImage ? "border-success bg-success/5" : "border-border hover:border-primary"}`}
+                  onClick={() => !backImage && handleCapture("back")}
                 >
                   {backImage ? (
-                    <div className="space-y-3">
+                    <div className="space-y-2 md:space-y-3">
                       <img
                         src={backImage}
                         alt="Verso"
-                        className="max-h-40 mx-auto rounded-lg"
+                        className="max-h-24 md:max-h-36 mx-auto rounded-lg"
                       />
-                      <p className="text-sm text-success font-medium">
+                      <p className="text-xs md:text-sm text-success font-medium">
                         Verso scanné
                       </p>
                       <div className="flex gap-2 justify-center">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleCapture("back")}
-                        >
-                          <CameraIcon className="w-4 h-4 mr-1" />
+                        <Button variant="ghost" size="sm" onClick={() => handleCapture("back")}>
+                          <CameraIcon className="w-3 h-3 md:w-4 md:h-4 mr-1" />
                           Reprendre
                         </Button>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => backFileInputRef.current?.click()}
-                        >
-                          <Upload className="w-4 h-4 mr-1" />
+                        <Button variant="ghost" size="sm" onClick={() => backFileInputRef.current?.click()}>
+                          <Upload className="w-3 h-3 md:w-4 md:h-4 mr-1" />
                           Changer
                         </Button>
                       </div>
                     </div>
                   ) : (
-                    <div className="space-y-3">
-                      <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto">
-                        <IdCard className="w-8 h-8 text-primary" />
+                    <div className="space-y-2 md:space-y-3 py-4 md:py-6">
+                      <div className="w-12 h-12 md:w-16 md:h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto">
+                        <IdCard className="w-6 h-6 md:w-8 md:h-8 text-primary" />
                       </div>
-                      <p className="font-medium">Verso carte d&apos;identité</p>
-                      <p className="text-sm text-muted">
+                      <p className="font-medium text-sm md:text-base">Verso carte d&apos;identité</p>
+                      <p className="text-xs md:text-sm text-muted">
                         Prenez une photo ou importez
                       </p>
-                      <div className="flex gap-2 justify-center">
+                      <div className="flex flex-col sm:flex-row gap-2 justify-center mt-2">
                         <Button onClick={() => handleCapture("back")} size="sm">
                           <CameraIcon className="w-4 h-4 mr-1" />
                           Scanner
                         </Button>
-                        <Button
-                          variant="secondary"
-                          size="sm"
-                          onClick={() => backFileInputRef.current?.click()}
-                        >
+                        <Button variant="secondary" size="sm" onClick={() => backFileInputRef.current?.click()}>
                           <Upload className="w-4 h-4 mr-1" />
                           Importer
                         </Button>
@@ -356,20 +339,11 @@ export default function NewCitizenPage() {
                 <div className="text-center">
                   <Button
                     size="lg"
-                    onClick={() => {
-                      setStep("form")
-                      handleOcrExtract()
-                    }}
-                    disabled={loading}
+                    className="w-full sm:w-auto"
+                    onClick={() => setStep("form")}
                   >
-                    {loading ? (
-                      "Extraction en cours..."
-                    ) : (
-                      <>
-                        <Scan className="w-5 h-5 mr-2" />
-                        Extraire les données (OCR)
-                      </>
-                    )}
+                    <Check className="w-5 h-5 mr-2" />
+                    Continuer vers le formulaire
                   </Button>
                 </div>
               )}
@@ -377,139 +351,69 @@ export default function NewCitizenPage() {
           )}
 
           {step === "form" && (
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <h3 className="font-semibold text-sm text-muted border-b border-border pb-2">
-                Identité
-              </h3>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <Input
-                  id="last_name"
-                  label="Nom"
-                  value={formData.last_name}
-                  onChange={(e) => setFormData((p) => ({ ...p, last_name: e.target.value }))}
-                  required
-                />
-                <Input
-                  id="first_name"
-                  label="Prénom"
-                  value={formData.first_name}
-                  onChange={(e) => setFormData((p) => ({ ...p, first_name: e.target.value }))}
-                  required
-                />
-                <Input
-                  id="father_name"
-                  label="Nom du père"
-                  value={formData.father_name}
-                  onChange={(e) => setFormData((p) => ({ ...p, father_name: e.target.value }))}
-                />
-                <Input
-                  id="mother_name"
-                  label="Nom de la mère"
-                  value={formData.mother_name}
-                  onChange={(e) => setFormData((p) => ({ ...p, mother_name: e.target.value }))}
-                />
-                <Input
-                  id="national_id"
-                  label="CIN"
-                  value={formData.national_id}
-                  onChange={(e) => setFormData((p) => ({ ...p, national_id: e.target.value }))}
-                  required
-                />
-                <Input
-                  id="birth_date"
-                  label="Date de naissance"
-                  type="date"
-                  value={formData.birth_date}
-                  onChange={(e) => setFormData((p) => ({ ...p, birth_date: e.target.value }))}
-                  required
-                />
-                <Select
-                  id="gender"
-                  label="Sexe"
-                  value={formData.gender}
-                  onChange={(e) => setFormData((p) => ({ ...p, gender: e.target.value as "male" | "female" }))}
-                  options={[
-                    { value: "male", label: "Homme" },
-                    { value: "female", label: "Femme" },
-                  ]}
-                  required
-                />
-                <Input
-                  id="nationality"
-                  label="Nationalité"
-                  value={formData.nationality}
-                  onChange={(e) => setFormData((p) => ({ ...p, nationality: e.target.value }))}
-                />
+            <form onSubmit={handleSubmit} className="space-y-4 md:space-y-6">
+              {ocrLoading && (
+                <div className="flex items-center gap-3 bg-primary/10 rounded-lg px-4 py-3 text-sm text-primary">
+                  <Loader2 className="w-5 h-5 animate-spin shrink-0" />
+                  Extraction OCR en cours...
+                </div>
+              )}
+
+              <div>
+                <h3 className="font-semibold text-xs md:text-sm text-muted border-b border-border pb-1.5 md:pb-2 mb-3 md:mb-4">
+                  Identité
+                </h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4">
+                  <Input id="last_name" label="Nom" value={formData.last_name} onChange={(e) => setFormData((p) => ({ ...p, last_name: e.target.value }))} required />
+                  <Input id="first_name" label="Prénom" value={formData.first_name} onChange={(e) => setFormData((p) => ({ ...p, first_name: e.target.value }))} required />
+                  <Input id="father_name" label="Nom du père" value={formData.father_name} onChange={(e) => setFormData((p) => ({ ...p, father_name: e.target.value }))} />
+                  <Input id="mother_name" label="Nom de la mère" value={formData.mother_name} onChange={(e) => setFormData((p) => ({ ...p, mother_name: e.target.value }))} />
+                  <Input id="national_id" label="CIN" value={formData.national_id} onChange={(e) => setFormData((p) => ({ ...p, national_id: e.target.value }))} required />
+                  <Input id="birth_date" label="Date de naissance" type="date" value={formData.birth_date} onChange={(e) => setFormData((p) => ({ ...p, birth_date: e.target.value }))} required />
+                  <Select id="gender" label="Sexe" value={formData.gender} onChange={(e) => setFormData((p) => ({ ...p, gender: e.target.value as "male" | "female" }))} options={[{ value: "male", label: "Homme" }, { value: "female", label: "Femme" }]} required />
+                  <Input id="nationality" label="Nationalité" value={formData.nationality} onChange={(e) => setFormData((p) => ({ ...p, nationality: e.target.value }))} />
+                </div>
               </div>
 
-              <h3 className="font-semibold text-sm text-muted border-b border-border pb-2 pt-2">
-                Contact & Profession
-              </h3>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <Input
-                  id="phone"
-                  label="Téléphone"
-                  type="tel"
-                  value={formData.phone}
-                  onChange={(e) => setFormData((p) => ({ ...p, phone: e.target.value }))}
-                />
-                <Input
-                  id="profession"
-                  label="Profession"
-                  value={formData.profession}
-                  onChange={(e) => setFormData((p) => ({ ...p, profession: e.target.value }))}
-                />
-                <Select
-                  id="marital_status"
-                  label="Situation familiale"
-                  value={formData.marital_status}
-                  onChange={(e) => setFormData((p) => ({ ...p, marital_status: e.target.value as "single" | "married" | "divorced" | "widowed" }))}
-                  options={[
-                    { value: "single", label: "Célibataire" },
-                    { value: "married", label: "Marié(e)" },
-                    { value: "divorced", label: "Divorcé(e)" },
-                    { value: "widowed", label: "Veuf/Veuve" },
-                  ]}
-                />
+              <div>
+                <h3 className="font-semibold text-xs md:text-sm text-muted border-b border-border pb-1.5 md:pb-2 mb-3 md:mb-4">
+                  Contact & Profession
+                </h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4">
+                  <Input id="phone" label="Téléphone" type="tel" value={formData.phone} onChange={(e) => setFormData((p) => ({ ...p, phone: e.target.value }))} />
+                  <Input id="profession" label="Profession" value={formData.profession} onChange={(e) => setFormData((p) => ({ ...p, profession: e.target.value }))} />
+                  <Select id="marital_status" label="Situation familiale" value={formData.marital_status} onChange={(e) => setFormData((p) => ({ ...p, marital_status: e.target.value as "single" | "married" | "divorced" | "widowed" }))} options={[{ value: "single", label: "Célibataire" }, { value: "married", label: "Marié(e)" }, { value: "divorced", label: "Divorcé(e)" }, { value: "widowed", label: "Veuf/Veuve" }]} />
+                </div>
               </div>
 
-              <h3 className="font-semibold text-sm text-muted border-b border-border pb-2 pt-2">
-                Adresse
-              </h3>
-              <Input
-                id="address"
-                label="Adresse"
-                value={formData.address}
-                onChange={(e) => setFormData((p) => ({ ...p, address: e.target.value }))}
-                required
-              />
-              <Select
-                id="sector"
-                label="Secteur"
-                value={formData.sector}
-                onChange={(e) => setFormData((p) => ({ ...p, sector: e.target.value }))}
-                options={sectors.map((s) => ({ value: s, label: s }))}
-                required
-              />
+              <div>
+                <h3 className="font-semibold text-xs md:text-sm text-muted border-b border-border pb-1.5 md:pb-2 mb-3 md:mb-4">
+                  Adresse
+                </h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4">
+                  <Input id="address" label="Adresse" value={formData.address} onChange={(e) => setFormData((p) => ({ ...p, address: e.target.value }))} required />
+                  <Select id="sector" label="Secteur" value={formData.sector} onChange={(e) => setFormData((p) => ({ ...p, sector: e.target.value }))} options={sectors.map((s) => ({ value: s, label: s }))} required />
+                </div>
+              </div>
 
               {(frontImage || backImage) && (
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4 pt-2">
                   {frontImage && (
                     <div>
-                      <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Recto</p>
-                      <img src={frontImage} alt="Recto" className="max-h-32 rounded-lg border" />
+                      <p className="text-xs md:text-sm font-medium text-foreground mb-1">Recto</p>
+                      <img src={frontImage} alt="Recto" className="max-h-24 md:max-h-32 rounded-lg border border-border w-full object-cover" />
                     </div>
                   )}
                   {backImage && (
                     <div>
-                      <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Verso</p>
-                      <img src={backImage} alt="Verso" className="max-h-32 rounded-lg border" />
+                      <p className="text-xs md:text-sm font-medium text-foreground mb-1">Verso</p>
+                      <img src={backImage} alt="Verso" className="max-h-24 md:max-h-32 rounded-lg border border-border w-full object-cover" />
                     </div>
                   )}
                 </div>
               )}
 
-              <div className="flex gap-3 pt-4">
+              <div className="flex flex-col sm:flex-row gap-3 pt-2 md:pt-4">
                 <Button type="button" variant="ghost" onClick={() => setStep("scan")}>
                   Modifier les scans
                 </Button>

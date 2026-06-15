@@ -12,26 +12,28 @@ export default async function DashboardPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-bold text-foreground">
+          <h1 className="text-xl md:text-2xl font-bold text-foreground">
             Tableau de bord
           </h1>
-          <p className="text-muted text-sm mt-1">
+          <p className="text-muted text-xs md:text-sm mt-0.5">
             Vue d&apos;ensemble de la base habitants
           </p>
         </div>
-        <div className="flex gap-3">
+        <div className="flex gap-2 md:gap-3">
           <Link href="/dashboard/citizens/new">
-            <Button size="lg">
-              <UserPlus className="w-5 h-5 mr-2" />
-              Nouveau habitant
+            <Button size="sm" className="md:size-lg">
+              <UserPlus className="w-4 h-4 md:w-5 md:h-5 mr-1 md:mr-2" />
+              <span className="hidden xs:inline">Nouveau habitant</span>
+              <span className="xs:hidden">Ajouter</span>
             </Button>
           </Link>
           <Link href="/dashboard/reports">
-            <Button variant="secondary" size="lg">
-              <BarChart3 className="w-5 h-5 mr-2" />
-              Rapports
+            <Button variant="secondary" size="sm" className="md:size-lg">
+              <BarChart3 className="w-4 h-4 md:w-5 md:h-5 mr-1 md:mr-2" />
+              <span className="hidden xs:inline">Rapports</span>
+              <span className="xs:hidden">Rapport</span>
             </Button>
           </Link>
         </div>
@@ -76,8 +78,8 @@ export default async function DashboardPage() {
 
         <Card>
           <CardContent className="flex items-center gap-4 py-6">
-            <div className="w-12 h-12 bg-blue-500/10 rounded-full flex items-center justify-center">
-              <MapPin className="w-6 h-6 text-blue-500" />
+            <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center">
+              <MapPin className="w-6 h-6 text-primary" />
             </div>
             <div>
               <p className="text-sm text-muted">Secteurs</p>
@@ -131,7 +133,7 @@ export default async function DashboardPage() {
                 </thead>
                 <tbody>
                   {recentCitizens.map((citizen) => (
-                    <tr key={citizen.id} className="border-b border-border hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
+                    <tr key={citizen.id} className="border-b border-border hover:bg-hover transition-colors">
                       <td className="py-3 px-6 font-medium">{citizen.last_name}</td>
                       <td className="py-3 px-6">{citizen.first_name}</td>
                       <td className="py-3 px-6">
@@ -172,7 +174,7 @@ export default async function DashboardPage() {
                     <div key={sector} className="flex items-center justify-between">
                       <span className="text-sm font-medium">{sector}</span>
                       <div className="flex items-center gap-3">
-                        <div className="w-32 h-2 bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden">
+                        <div className="w-32 h-2 bg-hover rounded-full overflow-hidden">
                           <div
                             className="h-full bg-primary rounded-full"
                             style={{
@@ -206,8 +208,8 @@ export default async function DashboardPage() {
                 <p className="text-sm font-medium">Hommes</p>
               </div>
               <div className="text-center flex-1">
-                <div className="w-20 h-20 bg-pink-100 dark:bg-pink-900/30 rounded-full flex items-center justify-center mx-auto mb-2">
-                  <span className="text-2xl font-bold text-pink-500">
+                <div className="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-2">
+                  <span className="text-2xl font-bold text-primary">
                     {stats.by_gender.female}
                   </span>
                 </div>
