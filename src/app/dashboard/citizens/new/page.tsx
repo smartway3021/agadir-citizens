@@ -246,13 +246,13 @@ export default function NewCitizenPage() {
                         Recto scanné
                       </p>
                       <div className="flex gap-2 justify-center">
+                        <Button variant="ghost" size="sm" onClick={() => fileInputRef.current?.click()}>
+                          <Upload className="w-3 h-3 md:w-4 md:h-4 mr-1" />
+                          Galerie
+                        </Button>
                         <Button variant="ghost" size="sm" onClick={() => handleCapture("front")}>
                           <CameraIcon className="w-3 h-3 md:w-4 md:h-4 mr-1" />
                           Reprendre
-                        </Button>
-                        <Button variant="ghost" size="sm" onClick={() => fileInputRef.current?.click()}>
-                          <Upload className="w-3 h-3 md:w-4 md:h-4 mr-1" />
-                          Changer
                         </Button>
                       </div>
                     </div>
@@ -266,13 +266,13 @@ export default function NewCitizenPage() {
                         Prenez une photo ou importez
                       </p>
                       <div className="flex flex-col sm:flex-row gap-2 justify-center mt-2">
-                        <Button onClick={() => handleCapture("front")} size="sm">
+                        <Button onClick={() => fileInputRef.current?.click()} size="sm">
+                          <Upload className="w-4 h-4 mr-1" />
+                          Importer de la galerie
+                        </Button>
+                        <Button variant="secondary" size="sm" onClick={() => handleCapture("front")}>
                           <CameraIcon className="w-4 h-4 mr-1" />
                           Scanner
-                        </Button>
-                        <Button variant="secondary" size="sm" onClick={() => fileInputRef.current?.click()}>
-                          <Upload className="w-4 h-4 mr-1" />
-                          Importer
                         </Button>
                       </div>
                     </div>
@@ -281,6 +281,7 @@ export default function NewCitizenPage() {
                     ref={fileInputRef}
                     type="file"
                     accept="image/*"
+                    capture="environment"
                     className="hidden"
                     onChange={(e) => handleFileUpload("front", e)}
                   />
@@ -301,13 +302,13 @@ export default function NewCitizenPage() {
                         Verso scanné
                       </p>
                       <div className="flex gap-2 justify-center">
+                        <Button variant="ghost" size="sm" onClick={() => backFileInputRef.current?.click()}>
+                          <Upload className="w-3 h-3 md:w-4 md:h-4 mr-1" />
+                          Galerie
+                        </Button>
                         <Button variant="ghost" size="sm" onClick={() => handleCapture("back")}>
                           <CameraIcon className="w-3 h-3 md:w-4 md:h-4 mr-1" />
                           Reprendre
-                        </Button>
-                        <Button variant="ghost" size="sm" onClick={() => backFileInputRef.current?.click()}>
-                          <Upload className="w-3 h-3 md:w-4 md:h-4 mr-1" />
-                          Changer
                         </Button>
                       </div>
                     </div>
@@ -321,13 +322,13 @@ export default function NewCitizenPage() {
                         Prenez une photo ou importez
                       </p>
                       <div className="flex flex-col sm:flex-row gap-2 justify-center mt-2">
-                        <Button onClick={() => handleCapture("back")} size="sm">
+                        <Button onClick={() => backFileInputRef.current?.click()} size="sm">
+                          <Upload className="w-4 h-4 mr-1" />
+                          Importer de la galerie
+                        </Button>
+                        <Button variant="secondary" size="sm" onClick={() => handleCapture("back")}>
                           <CameraIcon className="w-4 h-4 mr-1" />
                           Scanner
-                        </Button>
-                        <Button variant="secondary" size="sm" onClick={() => backFileInputRef.current?.click()}>
-                          <Upload className="w-4 h-4 mr-1" />
-                          Importer
                         </Button>
                       </div>
                     </div>
@@ -336,6 +337,7 @@ export default function NewCitizenPage() {
                     ref={backFileInputRef}
                     type="file"
                     accept="image/*"
+                    capture="environment"
                     className="hidden"
                     onChange={(e) => handleFileUpload("back", e)}
                   />

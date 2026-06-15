@@ -94,6 +94,18 @@ export function Camera({ side, onCapture, onClose }: CameraProps) {
     }
   }, [captured, checkVideoTrack])
 
+  function captureVideoFrame(): string | null {
+    const video = webcamRef.current?.video
+    if (!video || !video.videoWidth) return null
+    const canvas = document.createElement("canvas")
+    canvas.width = video.videoWidth
+    canvas.height = video.videoHeight
+    const ctx = canvas.getContext("2d")
+    if (!ctx) return null
+    ctx.drawImage(video, 0, 0)
+    return canvas.toDataURL("image/jpeg", 0.92)
+  }
+
   const startAutoCapture = useCallback(() => {
     if (timerRef.current) clearInterval(timerRef.current)
 
@@ -128,9 +140,9 @@ export function Camera({ side, onCapture, onClose }: CameraProps) {
         setStableCount(frames)
         if (frames >= STABLE_FRAMES && !autoCapturing) {
           setAutoCapturing(true)
-          const screenshot = webcamRef.current?.getScreenshot()
-          if (screenshot) {
-            setCaptured(screenshot)
+          const frame = captureVideoFrame()
+          if (frame) {
+            setCaptured(frame)
             if (timerRef.current) clearInterval(timerRef.current)
           }
         }
@@ -160,7 +172,7 @@ export function Camera({ side, onCapture, onClose }: CameraProps) {
 
   const capture = useCallback(() => {
     if (autoCapturing) return
-    const imageSrc = webcamRef.current?.getScreenshot()
+    const imageSrc = captureVideoFrame()
     if (imageSrc) {
       setCaptured(imageSrc)
       if (timerRef.current) clearInterval(timerRef.current)
