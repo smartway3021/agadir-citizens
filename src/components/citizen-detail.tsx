@@ -16,7 +16,7 @@ import {
 } from "lucide-react"
 import Link from "next/link"
 
-const moroccanCities = [
+const sectors = [
   "Agadir", "Casablanca", "Rabat", "Marrakech", "Fès", "Tanger",
   "Meknès", "Oujda", "Kénitra", "Tétouan", "Safi", "El Jadida",
   "Beni Mellal", "Laâyoune", "Tiznit", "Inezgane", "Aït Melloul",
@@ -56,7 +56,7 @@ function Field({
             }
             className="w-full rounded-lg border border-border px-3 py-2 text-sm"
           >
-            {(field === "city" ? moroccanCities : [
+            {(field === "sector" ? sectors : [
               { value: "male", label: "Homme" },
               { value: "female", label: "Femme" },
             ]).map((opt) => {
@@ -193,7 +193,7 @@ export function CitizenDetail({ citizen }: Props) {
                 <div className="col-span-2">
                   <Field label="Adresse" value={citizen.address} field="address" editing={editing} form={form} setForm={setForm} />
                 </div>
-                <Field label="Ville" value={citizen.city} field="city" editing={editing} form={form} setForm={setForm} />
+                <Field label="Secteur" value={citizen.sector} field="sector" editing={editing} form={form} setForm={setForm} />
               </div>
             </CardContent>
           </Card>

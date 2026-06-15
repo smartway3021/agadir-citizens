@@ -14,7 +14,7 @@ import {
 
 export default function ReportsPage() {
   const [period, setPeriod] = useState<string>("all")
-  const [city, setCity] = useState("")
+  const [sector, setSector] = useState("")
   const [customStart, setCustomStart] = useState("")
   const [customEnd, setCustomEnd] = useState("")
   const [loadingPdf, setLoadingPdf] = useState(false)
@@ -23,7 +23,7 @@ export default function ReportsPage() {
   function buildExportParams() {
     const params = new URLSearchParams()
     params.set("period", period)
-    if (city) params.set("city", city)
+    if (sector) params.set("sector", sector)
     if (period === "custom") {
       if (customStart) params.set("start_date", customStart)
       if (customEnd) params.set("end_date", customEnd)
@@ -55,7 +55,7 @@ export default function ReportsPage() {
     setLoadingExcel(true)
     try {
       const params = new URLSearchParams()
-      if (city) params.set("city", city)
+      if (sector) params.set("sector", sector)
       if (customStart) params.set("start_date", customStart)
       if (customEnd) params.set("end_date", customEnd)
 
@@ -158,13 +158,13 @@ export default function ReportsPage() {
             <div>
               <p className="text-sm font-medium text-gray-700 mb-2">
                 <MapPin className="w-4 h-4 inline mr-1" />
-                Ville (optionnel)
+                Secteur (optionnel)
               </p>
               <input
                 type="text"
-                value={city}
-                onChange={(e) => setCity(e.target.value)}
-                placeholder="Toutes les villes"
+                value={sector}
+                onChange={(e) => setSector(e.target.value)}
+                placeholder="Tous les secteurs"
                 className="w-full rounded-lg border border-border px-3 py-2 text-sm"
               />
             </div>
@@ -203,13 +203,13 @@ export default function ReportsPage() {
             <div>
               <p className="text-sm font-medium text-gray-700 mb-2">
                 <MapPin className="w-4 h-4 inline mr-1" />
-                Filtre par ville (optionnel)
+                Filtre par secteur (optionnel)
               </p>
               <input
                 type="text"
-                value={city}
-                onChange={(e) => setCity(e.target.value)}
-                placeholder="Toutes les villes"
+                value={sector}
+                onChange={(e) => setSector(e.target.value)}
+                placeholder="Tous les secteurs"
                 className="w-full rounded-lg border border-border px-3 py-2 text-sm"
               />
             </div>
@@ -262,7 +262,7 @@ export default function ReportsPage() {
 
             <div className="bg-gray-50 rounded-lg p-3">
               <p className="text-xs text-muted">
-                Colonnes: Nom, Prénom, CIN, Date de naissance, Adresse, Ville, Sexe, Date d&apos;ajout
+                Colonnes: Nom, Prénom, CIN, Date de naissance, Adresse, Secteur, Sexe, Date d&apos;ajout
               </p>
             </div>
           </CardContent>

@@ -9,7 +9,7 @@ export async function GET(req: Request) {
     const supabase = createAdminClient()
 
     const period = searchParams.get("period") || "all"
-    const city = searchParams.get("city") || ""
+    const sector = searchParams.get("sector") || ""
     const customStart = searchParams.get("start_date") || ""
     const customEnd = searchParams.get("end_date") || ""
 
@@ -42,17 +42,17 @@ export async function GET(req: Request) {
     if (period === "custom" && customEnd) {
       query = query.lte("created_at", `${customEnd}T23:59:59`)
     }
-    if (city) query = query.eq("city", city)
+    if (sector) query = query.eq("sector", sector)
 
     const { data } = await query
 
     const citizens = data || []
 
     // Stats
-    const byCity: Record<string, number> = {}
+    const bySector: Record<string, number> = {}
     const byGender = { male: 0, female: 0 }
     citizens.forEach((c: Record<string, unknown>) => {
-      byCity[c.city as string] = (byCity[c.city as string] || 0) + 1
+      bySector[c.sector as string] = (bySector[c.sector as string] || 0) + 1
       if (c.gender === "male") byGender.male++
       else byGender.female++
     })
@@ -93,10 +93,10 @@ export async function GET(req: Request) {
       period === "custom" ? "Période personnalisée" : "Toute la base"
     doc.text(`Période: ${periodLabel}`, 20, 68)
 
-    if (city) doc.text(`Ville: ${city}`, 20, 76)
+    if (sector) doc.text(`Secteur: ${sector}`, 20, 76)
 
     // Gender stats
-    let yPos = city ? 84 : 76
+    let yPos = sector ? 84 : 76
     doc.setFontSize(11)
     doc.text("Répartition par sexe:", 20, yPos)
     doc.setFontSize(10)
@@ -106,18 +106,18 @@ export async function GET(req: Request) {
     // City stats
     yPos = yPos + 24
     doc.setFontSize(11)
-    doc.text("Répartition par ville:", 20, yPos)
+    doc.text("Répartition par secteur:", 20, yPos)
     doc.setFontSize(10)
 
-    const cityEntries = Object.entries(byCity).sort(([, a], [, b]) => b - a)
-    let cityY = yPos + 8
-    cityEntries.forEach(([cityName, count]) => {
-      if (cityY > 260) {
+    const sectorEntries = Object.entries(bySector).sort(([, a], [, b]) => b - a)
+    let sectorY = yPos + 8
+    sectorEntries.forEach(([sectorName, count]) => {
+      if (sectorY > 260) {
         doc.addPage()
-        cityY = 20
+        sectorY = 20
       }
-      doc.text(`• ${cityName}: ${count} habitant${count > 1 ? "s" : ""}`, 30, cityY)
-      cityY += 7
+      doc.text(`• ${sectorName}: ${count} habitant${count > 1 ? "s" : ""}`, 30, sectorY)
+      sectorY += 7
     })
 
     // Table
@@ -132,14 +132,14 @@ export async function GET(req: Request) {
         c.last_name,
         c.first_name,
         c.national_id,
-        c.city,
+        c.sector,
         c.gender === "male" ? "H" : "F",
         new Date(c.created_at as string).toLocaleDateString("fr-FR"),
       ])
 
       doc.autoTable({
         startY: 28,
-        head: [["Nom", "Prénom", "CIN", "Ville", "Sexe", "Date d'ajout"]],
+        head: [["Nom", "Prénom", "CIN", "Secteur", "Sexe", "Date d'ajout"]],
         body: tableData,
         theme: "grid",
         headStyles: {

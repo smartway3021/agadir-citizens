@@ -1,11 +1,14 @@
-import { getDashboardStats } from "@/lib/db"
+import { getDashboardStats, getCitizens } from "@/lib/db"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
-import { Users, UserPlus, MapPin, BarChart3 } from "lucide-react"
+import { Users, UserPlus, MapPin, BarChart3, Eye, ArrowUpRight } from "lucide-react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
+import { formatDate } from "@/lib/utils"
+import { Badge } from "@/components/ui/badge"
 
 export default async function DashboardPage() {
   const stats = await getDashboardStats()
+  const { citizens: recentCitizens } = await getCitizens({ limit: 10 })
 
   return (
     <div className="space-y-6">
@@ -77,31 +80,97 @@ export default async function DashboardPage() {
               <MapPin className="w-6 h-6 text-blue-500" />
             </div>
             <div>
-              <p className="text-sm text-muted">Villes</p>
+              <p className="text-sm text-muted">Secteurs</p>
               <p className="text-2xl font-bold">
-                {Object.keys(stats.by_city).length}
+                {Object.keys(stats.by_sector).length}
               </p>
             </div>
           </CardContent>
         </Card>
       </div>
 
+      <Card>
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <h3 className="font-semibold">Derniers habitants ajoutés</h3>
+            <Link href="/dashboard/citizens">
+              <Button variant="ghost" size="sm">
+                Voir tout
+                <ArrowUpRight className="w-4 h-4 ml-1" />
+              </Button>
+            </Link>
+          </div>
+        </CardHeader>
+        <CardContent className="p-0">
+          {recentCitizens.length === 0 ? (
+            <div className="text-center py-12 px-6">
+              <Users className="w-12 h-12 text-muted mx-auto mb-3" />
+              <p className="text-muted font-medium">Aucun habitant pour le moment</p>
+              <p className="text-sm text-muted mt-1">
+                Ajoutez votre premier habitant via le bouton &quot;Nouveau habitant&quot;
+              </p>
+              <Link href="/dashboard/citizens/new">
+                <Button className="mt-4">
+                  <UserPlus className="w-4 h-4 mr-2" />
+                  Nouveau habitant
+                </Button>
+              </Link>
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b border-border">
+                    <th className="text-left py-3 px-6 font-medium text-muted">Nom</th>
+                    <th className="text-left py-3 px-6 font-medium text-muted">Prénom</th>
+                    <th className="text-left py-3 px-6 font-medium text-muted">CIN</th>
+                    <th className="text-left py-3 px-6 font-medium text-muted">Secteur</th>
+                    <th className="text-left py-3 px-6 font-medium text-muted">Date d&apos;ajout</th>
+                    <th className="text-right py-3 px-6 font-medium text-muted">Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {recentCitizens.map((citizen) => (
+                    <tr key={citizen.id} className="border-b border-border hover:bg-gray-50 transition-colors">
+                      <td className="py-3 px-6 font-medium">{citizen.last_name}</td>
+                      <td className="py-3 px-6">{citizen.first_name}</td>
+                      <td className="py-3 px-6">
+                        <Badge>{citizen.national_id}</Badge>
+                      </td>
+                      <td className="py-3 px-6">{citizen.sector}</td>
+                      <td className="py-3 px-6 text-muted">{formatDate(citizen.created_at)}</td>
+                      <td className="py-3 px-6 text-right">
+                        <Link href={`/dashboard/citizens/${citizen.id}`}>
+                          <Button variant="ghost" size="sm">
+                            <Eye className="w-4 h-4" />
+                          </Button>
+                        </Link>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <Card>
           <CardHeader>
-            <h3 className="font-semibold">Répartition par ville</h3>
+            <h3 className="font-semibold">Répartition par secteur</h3>
           </CardHeader>
           <CardContent>
-            {Object.keys(stats.by_city).length === 0 ? (
+            {Object.keys(stats.by_sector).length === 0 ? (
               <p className="text-muted text-sm">Aucune donnée</p>
             ) : (
               <div className="space-y-3">
-                {Object.entries(stats.by_city)
+                {Object.entries(stats.by_sector)
                   .sort(([, a], [, b]) => b - a)
                   .slice(0, 10)
-                  .map(([city, count]) => (
-                    <div key={city} className="flex items-center justify-between">
-                      <span className="text-sm font-medium">{city}</span>
+                  .map(([sector, count]) => (
+                    <div key={sector} className="flex items-center justify-between">
+                      <span className="text-sm font-medium">{sector}</span>
                       <div className="flex items-center gap-3">
                         <div className="w-32 h-2 bg-gray-100 rounded-full overflow-hidden">
                           <div

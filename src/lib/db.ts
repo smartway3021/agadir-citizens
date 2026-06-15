@@ -3,7 +3,7 @@ import type { Citizen, DashboardStats } from "./types"
 
 export async function getCitizens(options?: {
   search?: string
-  city?: string
+  sector?: string
   start_date?: string
   end_date?: string
   limit?: number
@@ -21,8 +21,8 @@ export async function getCitizens(options?: {
     )
   }
 
-  if (options?.city) {
-    query = query.eq("city", options.city)
+  if (options?.sector) {
+    query = query.eq("sector", options.sector)
   }
 
   if (options?.start_date) {
@@ -98,13 +98,13 @@ export async function getDashboardStats(): Promise<DashboardStats> {
     .select("*", { count: "exact", head: true })
     .gte("created_at", monthAgo)
 
-  const { data: cityData } = await supabase
+  const { data: sectorData } = await supabase
     .from("citizens")
-    .select("city")
+    .select("sector")
 
-  const byCity: Record<string, number> = {}
-  cityData?.forEach((c) => {
-    byCity[c.city] = (byCity[c.city] || 0) + 1
+  const bySector: Record<string, number> = {}
+  sectorData?.forEach((c) => {
+    bySector[c.sector] = (bySector[c.sector] || 0) + 1
   })
 
   const { data: genderData } = await supabase
@@ -121,18 +121,18 @@ export async function getDashboardStats(): Promise<DashboardStats> {
     total_citizens: total || 0,
     new_this_week: weekCount || 0,
     new_this_month: monthCount || 0,
-    by_city: byCity,
+    by_sector: bySector,
     by_gender: byGender,
   }
 }
 
-export async function getCities(): Promise<string[]> {
+export async function getSectors(): Promise<string[]> {
   const supabase = createAdminClient()
   const { data } = await supabase
     .from("citizens")
-    .select("city")
-    .order("city")
+    .select("sector")
+    .order("sector")
 
-  const cities = [...new Set(data?.map((c) => c.city).filter(Boolean))]
-  return cities as string[]
+  const sectors = [...new Set(data?.map((c) => c.sector).filter(Boolean))]
+  return sectors as string[]
 }

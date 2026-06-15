@@ -18,7 +18,7 @@ import {
 } from "lucide-react"
 import Link from "next/link"
 
-const moroccanCities = [
+const sectors = [
   "Agadir", "Casablanca", "Rabat", "Marrakech", "Fès", "Tanger",
   "Meknès", "Oujda", "Kénitra", "Tétouan", "Safi", "El Jadida",
   "Beni Mellal", "Laâyoune", "Tiznit", "Inezgane", "Aït Melloul",
@@ -40,7 +40,7 @@ export default function NewCitizenPage() {
     national_id: "",
     birth_date: "",
     address: "",
-    city: "",
+    sector: "",
     gender: "male" as "male" | "female",
   })
   const [showCamera, setShowCamera] = useState<"front" | "back" | null>(null)
@@ -429,13 +429,13 @@ export default function NewCitizenPage() {
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <Select
-                  id="city"
-                  label="Ville"
-                  value={formData.city}
+                  id="sector"
+                  label="Secteur"
+                  value={formData.sector}
                   onChange={(e) =>
-                    setFormData((p) => ({ ...p, city: e.target.value }))
+                    setFormData((p) => ({ ...p, sector: e.target.value }))
                   }
-                  options={moroccanCities.map((c) => ({
+                  options={sectors.map((c) => ({
                     value: c,
                     label: c,
                   }))}

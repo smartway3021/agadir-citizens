@@ -19,7 +19,7 @@ export async function createCitizenAction(formData: FormData) {
     national_id: formData.get("national_id") as string,
     birth_date: formData.get("birth_date") as string,
     address: formData.get("address") as string,
-    city: formData.get("city") as string,
+    sector: formData.get("sector") as string,
     gender: formData.get("gender") as "male" | "female",
     id_front_image_url: formData.get("id_front_image_url") as string | null,
     id_back_image_url: formData.get("id_back_image_url") as string | null,
@@ -36,7 +36,7 @@ export async function updateCitizenAction(id: string, formData: FormData) {
   const updates: Record<string, string | null> = {}
   const fields = [
     "first_name", "last_name", "national_id", "birth_date",
-    "address", "city", "gender", "id_front_image_url", "id_back_image_url"
+    "address", "sector", "gender", "id_front_image_url", "id_back_image_url"
   ]
 
   for (const field of fields) {

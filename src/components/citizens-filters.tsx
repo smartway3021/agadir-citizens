@@ -6,25 +6,25 @@ import { Search, X } from "lucide-react"
 import { useState } from "react"
 
 interface Props {
-  cities: string[]
+  sectors: string[]
 }
 
-export function CitizensFilters({ cities }: Props) {
+export function CitizensFilters({ sectors }: Props) {
   const router = useRouter()
   const searchParams = useSearchParams()
   const [search, setSearch] = useState(searchParams.get("search") || "")
-  const [city, setCity] = useState(searchParams.get("city") || "")
+  const [sector, setSector] = useState(searchParams.get("sector") || "")
 
   function applyFilters() {
     const params = new URLSearchParams()
     if (search) params.set("search", search)
-    if (city) params.set("city", city)
+    if (sector) params.set("sector", sector)
     router.push(`/dashboard/citizens?${params.toString()}`)
   }
 
   function resetFilters() {
     setSearch("")
-    setCity("")
+    setSector("")
     router.push("/dashboard/citizens")
   }
 
@@ -46,12 +46,12 @@ export function CitizensFilters({ cities }: Props) {
         />
       </div>
       <select
-        value={city}
-        onChange={(e) => setCity(e.target.value)}
+        value={sector}
+        onChange={(e) => setSector(e.target.value)}
         className="px-3 py-2 rounded-lg border border-border text-sm focus:outline-none focus:ring-2 focus:ring-primary"
       >
-        <option value="">Toutes les villes</option>
-        {cities.map((c) => (
+        <option value="">Tous les secteurs</option>
+        {sectors.map((c) => (
           <option key={c} value={c}>{c}</option>
         ))}
       </select>
@@ -59,7 +59,7 @@ export function CitizensFilters({ cities }: Props) {
         <Search className="w-4 h-4 mr-1" />
         Filtrer
       </Button>
-      {(search || city) && (
+      {(search || sector) && (
         <Button variant="ghost" onClick={resetFilters} size="sm">
           <X className="w-4 h-4 mr-1" />
           Réinitialiser

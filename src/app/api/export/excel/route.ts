@@ -12,11 +12,11 @@ export async function GET(req: Request) {
       .select("*")
       .order("created_at", { ascending: false })
 
-    const city = searchParams.get("city")
+    const sector = searchParams.get("sector")
     const startDate = searchParams.get("start_date")
     const endDate = searchParams.get("end_date")
 
-    if (city) query = query.eq("city", city)
+    if (sector) query = query.eq("sector", sector)
     if (startDate) query = query.gte("created_at", startDate)
     if (endDate) query = query.lte("created_at", endDate)
 
@@ -30,7 +30,7 @@ export async function GET(req: Request) {
       "CIN": c.national_id,
       "Date de naissance": c.birth_date,
       "Adresse": c.address,
-      "Ville": c.city,
+      "Secteur": c.sector,
       "Sexe": c.gender === "male" ? "Homme" : "Femme",
       "Date d'ajout": c.created_at,
     }))

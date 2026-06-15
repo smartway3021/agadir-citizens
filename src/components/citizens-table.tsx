@@ -44,7 +44,7 @@ export function CitizensTable({ citizens, currentPage, totalPages }: Props) {
               <th className="text-left py-3 px-4 font-medium text-muted">Nom</th>
               <th className="text-left py-3 px-4 font-medium text-muted">Prénom</th>
               <th className="text-left py-3 px-4 font-medium text-muted">CIN</th>
-              <th className="text-left py-3 px-4 font-medium text-muted">Ville</th>
+              <th className="text-left py-3 px-4 font-medium text-muted">Secteur</th>
               <th className="text-left py-3 px-4 font-medium text-muted">Sexe</th>
               <th className="text-left py-3 px-4 font-medium text-muted">Date d&apos;ajout</th>
               <th className="text-right py-3 px-4 font-medium text-muted">Actions</th>
@@ -58,7 +58,7 @@ export function CitizensTable({ citizens, currentPage, totalPages }: Props) {
                 <td className="py-3 px-4">
                   <Badge>{citizen.national_id}</Badge>
                 </td>
-                <td className="py-3 px-4">{citizen.city}</td>
+                <td className="py-3 px-4">{citizen.sector}</td>
                 <td className="py-3 px-4">
                   {citizen.gender === "male" ? "Homme" : "Femme"}
                 </td>

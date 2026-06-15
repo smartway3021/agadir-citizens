@@ -13,7 +13,7 @@ export async function GET(req: Request) {
       .order("created_at", { ascending: false })
 
     const search = searchParams.get("search")
-    const city = searchParams.get("city")
+    const sector = searchParams.get("sector")
     const startDate = searchParams.get("start_date")
     const endDate = searchParams.get("end_date")
     const limit = parseInt(searchParams.get("limit") || "100")
@@ -25,7 +25,7 @@ export async function GET(req: Request) {
       )
     }
 
-    if (city) query = query.eq("city", city)
+    if (sector) query = query.eq("sector", sector)
     if (startDate) query = query.gte("created_at", startDate)
     if (endDate) query = query.lte("created_at", endDate)
 
@@ -55,7 +55,7 @@ export async function POST(req: Request) {
       national_id: formData.get("national_id") as string,
       birth_date: formData.get("birth_date") as string,
       address: formData.get("address") as string,
-      city: formData.get("city") as string,
+      sector: formData.get("sector") as string,
       gender: formData.get("gender") as "male" | "female",
       id_front_image_url: (formData.get("id_front_image_url") as string) || null,
       id_back_image_url: (formData.get("id_back_image_url") as string) || null,

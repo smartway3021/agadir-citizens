@@ -6,7 +6,7 @@ CREATE TABLE IF NOT EXISTS citizens (
   national_id VARCHAR(50) NOT NULL UNIQUE,
   birth_date DATE NOT NULL,
   address TEXT NOT NULL,
-  city VARCHAR(255) NOT NULL,
+  sector VARCHAR(255) NOT NULL,
   gender VARCHAR(10) NOT NULL CHECK (gender IN ('male', 'female')),
   id_front_image_url TEXT,
   id_back_image_url TEXT,
@@ -16,7 +16,7 @@ CREATE TABLE IF NOT EXISTS citizens (
 
 -- Indexes
 CREATE INDEX IF NOT EXISTS idx_citizens_national_id ON citizens(national_id);
-CREATE INDEX IF NOT EXISTS idx_citizens_city ON citizens(city);
+CREATE INDEX IF NOT EXISTS idx_citizens_sector ON citizens(sector);
 CREATE INDEX IF NOT EXISTS idx_citizens_created_at ON citizens(created_at);
 CREATE INDEX IF NOT EXISTS idx_citizens_last_name ON citizens(last_name);
 

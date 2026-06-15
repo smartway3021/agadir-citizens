@@ -48,7 +48,7 @@ export async function POST(req: Request) {
       national_id: "",
       birth_date: "",
       address: "",
-      city: "",
+      sector: "",
       gender: "male",
     })
   } catch (error) {
@@ -68,7 +68,7 @@ function parseOcrText(text: string) {
   let national_id = ""
   let birth_date = ""
   const address = ""
-  const city = ""
+  const sector = ""
   let gender: "male" | "female" = "male"
 
   // CIN pattern: XX-XXXXXX or XX XXXXXX (Moroccan ID format)
@@ -115,7 +115,7 @@ function parseOcrText(text: string) {
     national_id,
     birth_date,
     address,
-    city,
+    sector,
     gender,
   }
 }
