@@ -1,5 +1,5 @@
 import { createAdminClient } from "./supabase/admin"
-import type { Citizen, DashboardStats } from "./types"
+import type { Citizen, Foreigner, DashboardStats } from "./types"
 
 export async function getCitizens(options?: {
   search?: string
@@ -124,6 +124,56 @@ export async function getDashboardStats(): Promise<DashboardStats> {
     by_sector: bySector,
     by_gender: byGender,
   }
+}
+
+export async function getForeigners(options?: {
+  search?: string
+  sector?: string
+  limit?: number
+  offset?: number
+}) {
+  const supabase = createAdminClient()
+  let query = supabase
+    .from("foreigners")
+    .select("*", { count: "exact" })
+    .order("created_at", { ascending: false })
+
+  if (options?.search) {
+    query = query.or(
+      `first_name.ilike.%${options.search}%,last_name.ilike.%${options.search}%,national_id.ilike.%${options.search}%`
+    )
+  }
+  if (options?.sector) {
+    query = query.eq("sector", options.sector)
+  }
+  if (options?.limit) {
+    query = query.range(options.offset || 0, (options.offset || 0) + options.limit - 1)
+  }
+
+  const { data, count } = await query
+  return { foreigners: (data as Foreigner[]) || [], total: count || 0 }
+}
+
+export async function getForeignerById(id: string) {
+  const supabase = createAdminClient()
+  const { data } = await supabase.from("foreigners").select("*").eq("id", id).single()
+  return data as Foreigner | null
+}
+
+export async function deleteForeigner(id: string) {
+  const supabase = createAdminClient()
+  const { error } = await supabase.from("foreigners").delete().eq("id", id)
+  if (error) throw error
+}
+
+export async function getForeignerSectors(): Promise<string[]> {
+  const supabase = createAdminClient()
+  const { data } = await supabase
+    .from("foreigners")
+    .select("sector")
+    .order("sector")
+  const sectors = [...new Set(data?.map((c) => c.sector).filter(Boolean))]
+  return sectors as string[]
 }
 
 export async function getSectors(): Promise<string[]> {

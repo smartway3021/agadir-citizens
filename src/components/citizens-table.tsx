@@ -68,18 +68,21 @@ export function CitizensTable({ citizens, currentPage, totalPages }: Props) {
     if (fileRef.current) fileRef.current.value = ""
   }
 
-  function downloadPNG(url: string, name: string) {
+  async function downloadPNG(url: string, name: string) {
+    const res = await fetch(url)
+    const blob = await res.blob()
+    const blobUrl = URL.createObjectURL(blob)
     const a = document.createElement("a")
-    a.href = url
-    a.download = `${name}.png`
-    a.target = "_blank"
-    a.click()
+    a.href = blobUrl; a.download = `${name}.png`
+    document.body.appendChild(a); a.click()
+    document.body.removeChild(a)
+    URL.revokeObjectURL(blobUrl)
   }
 
   async function downloadPDF(imageUrl: string, name: string) {
     const { default: jsPDF } = await import("jspdf")
     const img = new Image()
-    img.crossOrigin = "anonymous"
+    if (!imageUrl.startsWith("data:")) img.crossOrigin = "anonymous"
     img.src = imageUrl
     await new Promise((resolve, reject) => {
       img.onload = resolve; img.onerror = reject

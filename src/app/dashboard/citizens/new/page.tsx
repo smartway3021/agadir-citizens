@@ -7,7 +7,6 @@ import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { Select } from "@/components/ui/select"
 import { Camera, IdCard } from "@/components/camera"
-import { createClient } from "@/lib/supabase/client"
 import { runOcr } from "@/lib/ocr"
 import {
   ArrowLeft,
@@ -26,14 +25,11 @@ const sectors = [
 
 export default function NewCitizenPage() {
   const router = useRouter()
-  const supabase = createClient()
   const [step, setStep] = useState<"scan" | "form">("scan")
   const [loading, setLoading] = useState(false)
   const [ocrLoading, setOcrLoading] = useState(false)
   const [frontImage, setFrontImage] = useState<string | null>(null)
   const [backImage, setBackImage] = useState<string | null>(null)
-  const [frontFile, setFrontFile] = useState<File | null>(null)
-  const [backFile, setBackFile] = useState<File | null>(null)
   const [formData, setFormData] = useState({
     first_name: "",
     last_name: "",
@@ -79,20 +75,13 @@ export default function NewCitizenPage() {
 
   const handleCameraCapture = useCallback(
     async (side: "front" | "back", imageSrc: string) => {
-      const res = await fetch(imageSrc)
-      const blob = await res.blob()
-      const file = new File([blob], `card-${side}-${Date.now()}.jpg`, { type: "image/jpeg" })
-      const previewUrl = URL.createObjectURL(file)
-
       if (side === "front") {
-        setFrontFile(file)
-        setFrontImage(previewUrl)
+        setFrontImage(imageSrc)
         setShowCamera(null)
         await autoOcr(imageSrc)
         setStep("form")
       } else {
-        setBackFile(file)
-        setBackImage(previewUrl)
+        setBackImage(imageSrc)
         setShowCamera(null)
       }
     },
@@ -103,60 +92,35 @@ export default function NewCitizenPage() {
     async (side: "front" | "back", e: React.ChangeEvent<HTMLInputElement>) => {
       const file = e.target.files?.[0]
       if (!file) return
-      const previewUrl = URL.createObjectURL(file)
+
+      const dataUrl = await new Promise<string>((resolve) => {
+        const reader = new FileReader()
+        reader.onload = (ev) => resolve(ev.target?.result as string)
+        reader.readAsDataURL(file)
+      })
 
       if (side === "front") {
-        setFrontFile(file)
-        setFrontImage(previewUrl)
-        const reader = new FileReader()
-        reader.onload = async (ev) => {
-          const dataUrl = ev.target?.result as string
-          await autoOcr(dataUrl)
-          setStep("form")
-        }
-        reader.readAsDataURL(file)
+        setFrontImage(dataUrl)
+        await autoOcr(dataUrl)
+        setStep("form")
       } else {
-        setBackFile(file)
-        setBackImage(previewUrl)
+        setBackImage(dataUrl)
       }
     },
     []
   )
-
-  async function uploadImage(file: File, path: string): Promise<string> {
-    const { data } = await supabase.storage
-      .from("citizen-images")
-      .upload(path, file)
-    if (data) {
-      const { data: urlData } = supabase.storage
-        .from("citizen-images")
-        .getPublicUrl(data.path)
-      return urlData.publicUrl
-    }
-    return ""
-  }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     setLoading(true)
 
     try {
-      let frontUrl = ""
-      let backUrl = ""
-
-      if (frontFile) {
-        frontUrl = await uploadImage(frontFile, `front-${Date.now()}`)
-      }
-      if (backFile) {
-        backUrl = await uploadImage(backFile, `back-${Date.now()}`)
-      }
-
       const formPayload = new FormData()
       Object.entries(formData).forEach(([key, val]) => {
         formPayload.append(key, val)
       })
-      if (frontUrl) formPayload.append("id_front_image_url", frontUrl)
-      if (backUrl) formPayload.append("id_back_image_url", backUrl)
+      if (frontImage) formPayload.append("id_front_image_url", frontImage)
+      if (backImage) formPayload.append("id_back_image_url", backImage)
 
       const res = await fetch("/api/citizens", {
         method: "POST",

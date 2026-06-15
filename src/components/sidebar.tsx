@@ -8,6 +8,7 @@ import { useTheme } from "@/components/theme-provider"
 import {
   LayoutDashboard,
   Users,
+  Globe,
   FileText,
   LogOut,
   Plus,
@@ -21,6 +22,7 @@ import { useState, useEffect } from "react"
 const navItems = [
   { href: "/dashboard", label: "Tableau de bord", icon: LayoutDashboard },
   { href: "/dashboard/citizens", label: "Registre des habitants", icon: Users },
+  { href: "/dashboard/foreigners", label: "Registre des étrangers", icon: Globe },
   { href: "/dashboard/citizens/new", label: "Nouvel enregistrement", icon: Plus },
   { href: "/dashboard/reports", label: "Rapports officiels", icon: FileText },
 ]
