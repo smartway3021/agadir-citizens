@@ -1,0 +1,47 @@
+import { getCitizens, getCities } from "@/lib/db"
+import { CitizensTable } from "@/components/citizens-table"
+import { CitizensFilters } from "@/components/citizens-filters"
+import { Card, CardContent } from "@/components/ui/card"
+
+export default async function CitizensPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ search?: string; city?: string; page?: string }>
+}) {
+  const params = await searchParams
+  const page = parseInt(params.page || "1")
+  const limit = 20
+  const offset = (page - 1) * limit
+
+  const { citizens, total } = await getCitizens({
+    search: params.search,
+    city: params.city,
+    limit,
+    offset,
+  })
+
+  const cities = await getCities()
+  const totalPages = Math.ceil(total / limit)
+
+  return (
+    <div className="space-y-6">
+      <div>
+        <h1 className="text-2xl font-bold text-foreground">Habitants</h1>
+        <p className="text-muted text-sm mt-1">
+          {total} habitant{total > 1 ? "s" : ""} enregistré{total > 1 ? "s" : ""}
+        </p>
+      </div>
+
+      <Card>
+        <CardContent className="pt-6">
+          <CitizensFilters cities={cities} />
+          <CitizensTable
+            citizens={citizens}
+            currentPage={page}
+            totalPages={totalPages}
+          />
+        </CardContent>
+      </Card>
+    </div>
+  )
+}
