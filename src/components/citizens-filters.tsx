@@ -41,18 +41,18 @@ export function CitizensFilters({ sectors }: Props) {
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           onKeyDown={handleKeyDown}
-          placeholder="Rechercher par nom, prénom ou CIN..."
-          className="w-full pl-10 pr-4 py-2 rounded-lg border border-border text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+          placeholder="Rechercher par nom, prénom, CIN ou téléphone..."
+          className="w-full pl-10 pr-4 py-2 rounded-lg border border-border bg-card text-sm focus:outline-none focus:ring-2 focus:ring-primary"
         />
       </div>
       <select
         value={sector}
         onChange={(e) => setSector(e.target.value)}
-        className="px-3 py-2 rounded-lg border border-border text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+        className="px-3 py-2 rounded-lg border border-border bg-card text-sm focus:outline-none focus:ring-2 focus:ring-primary"
       >
         <option value="">Tous les secteurs</option>
-        {sectors.map((c) => (
-          <option key={c} value={c}>{c}</option>
+        {sectors.map((s) => (
+          <option key={s} value={s}>{s}</option>
         ))}
       </select>
       <Button onClick={applyFilters} size="sm">

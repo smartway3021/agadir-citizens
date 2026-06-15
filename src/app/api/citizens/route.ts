@@ -21,7 +21,7 @@ export async function GET(req: Request) {
 
     if (search) {
       query = query.or(
-        `first_name.ilike.%${search}%,last_name.ilike.%${search}%,national_id.ilike.%${search}%`
+        `first_name.ilike.%${search}%,last_name.ilike.%${search}%,national_id.ilike.%${search}%,phone.ilike.%${search}%`
       )
     }
 
@@ -31,9 +31,7 @@ export async function GET(req: Request) {
 
     query = query.range(offset, offset + limit - 1)
 
-    const { data, count, error } = await query
-
-    if (error) throw error
+    const { data, count } = await query
 
     return NextResponse.json({ citizens: data, total: count })
   } catch {
@@ -49,14 +47,20 @@ export async function POST(req: Request) {
     const formData = await req.formData()
     const supabase = createAdminClient()
 
-    const citizen = {
+    const citizen: Record<string, string | null> = {
       first_name: formData.get("first_name") as string,
       last_name: formData.get("last_name") as string,
+      father_name: (formData.get("father_name") as string) || "",
+      mother_name: (formData.get("mother_name") as string) || "",
       national_id: formData.get("national_id") as string,
       birth_date: formData.get("birth_date") as string,
       address: formData.get("address") as string,
       sector: formData.get("sector") as string,
-      gender: formData.get("gender") as "male" | "female",
+      gender: formData.get("gender") as string,
+      phone: (formData.get("phone") as string) || "",
+      profession: (formData.get("profession") as string) || "",
+      marital_status: (formData.get("marital_status") as string) || "single",
+      nationality: (formData.get("nationality") as string) || "Marocaine",
       id_front_image_url: (formData.get("id_front_image_url") as string) || null,
       id_back_image_url: (formData.get("id_back_image_url") as string) || null,
     }

@@ -59,7 +59,7 @@ export default function LoginPage() {
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="admin@agadir.ma"
+              placeholder="admin@anassguerrabi.ma"
               required
             />
             <Input
@@ -72,7 +72,7 @@ export default function LoginPage() {
               required
             />
             {error && (
-              <p className="text-sm text-danger bg-red-50 p-3 rounded-lg">
+              <p className="text-sm text-danger bg-red-50 dark:bg-red-900/20 p-3 rounded-lg">
                 {error}
               </p>
             )}

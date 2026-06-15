@@ -48,7 +48,6 @@ export async function GET(req: Request) {
 
     const citizens = data || []
 
-    // Stats
     const bySector: Record<string, number> = {}
     const byGender = { male: 0, female: 0 }
     citizens.forEach((c: Record<string, unknown>) => {
@@ -60,7 +59,6 @@ export async function GET(req: Request) {
     const doc = new jsPDF("p", "mm", "a4")
     const pageWidth = doc.internal.pageSize.getWidth()
 
-    // Header
     doc.setFontSize(10)
     doc.setTextColor(100)
     doc.text("Royaume du Maroc", pageWidth / 2, 20, { align: "center" })
@@ -71,17 +69,14 @@ export async function GET(req: Request) {
     doc.setTextColor(150)
     doc.text(`Date: ${now.toLocaleDateString("fr-FR")}`, pageWidth / 2, 34, { align: "center" })
 
-    // Separator
     doc.setDrawColor(30, 64, 175)
     doc.setLineWidth(0.5)
     doc.line(20, 38, pageWidth - 20, 38)
 
-    // Title
     doc.setFontSize(18)
     doc.setTextColor(0)
     doc.text("Rapport Administratif des Habitants", pageWidth / 2, 48, { align: "center" })
 
-    // Summary
     doc.setFontSize(12)
     doc.setTextColor(50)
     doc.text(`Total des habitants: ${citizens.length}`, 20, 60)
@@ -95,7 +90,6 @@ export async function GET(req: Request) {
 
     if (sector) doc.text(`Secteur: ${sector}`, 20, 76)
 
-    // Gender stats
     let yPos = sector ? 84 : 76
     doc.setFontSize(11)
     doc.text("Répartition par sexe:", 20, yPos)
@@ -103,24 +97,22 @@ export async function GET(req: Request) {
     doc.text(`Hommes: ${byGender.male}`, 30, yPos + 8)
     doc.text(`Femmes: ${byGender.female}`, 30, yPos + 16)
 
-    // City stats
     yPos = yPos + 24
     doc.setFontSize(11)
     doc.text("Répartition par secteur:", 20, yPos)
     doc.setFontSize(10)
 
     const sectorEntries = Object.entries(bySector).sort(([, a], [, b]) => b - a)
-    let sectorY = yPos + 8
-    sectorEntries.forEach(([sectorName, count]) => {
-      if (sectorY > 260) {
+    let secY = yPos + 8
+    sectorEntries.forEach(([secName, count]) => {
+      if (secY > 260) {
         doc.addPage()
-        sectorY = 20
+        secY = 20
       }
-      doc.text(`• ${sectorName}: ${count} habitant${count > 1 ? "s" : ""}`, 30, sectorY)
-      sectorY += 7
+      doc.text(`• ${secName}: ${count} habitant${count > 1 ? "s" : ""}`, 30, secY)
+      secY += 7
     })
 
-    // Table
     if (citizens.length > 0) {
       doc.addPage()
 
@@ -132,6 +124,7 @@ export async function GET(req: Request) {
         c.last_name,
         c.first_name,
         c.national_id,
+        c.phone || "-",
         c.sector,
         c.gender === "male" ? "H" : "F",
         new Date(c.created_at as string).toLocaleDateString("fr-FR"),
@@ -139,7 +132,7 @@ export async function GET(req: Request) {
 
       doc.autoTable({
         startY: 28,
-        head: [["Nom", "Prénom", "CIN", "Secteur", "Sexe", "Date d'ajout"]],
+        head: [["Nom", "Prénom", "CIN", "Téléphone", "Secteur", "Sexe", "Date d'ajout"]],
         body: tableData,
         theme: "grid",
         headStyles: {
@@ -154,7 +147,6 @@ export async function GET(req: Request) {
       })
     }
 
-    // Signature
     const finalY = doc.lastAutoTable?.finalY || 200
     const sigY = Math.min(finalY + 30, 260)
 
@@ -169,7 +161,6 @@ export async function GET(req: Request) {
       doc.line(pageWidth / 2 + 15, sigY + 10, pageWidth / 2 - 15, sigY + 20)
     }
 
-    // Footer
     doc.setFontSize(8)
     doc.setTextColor(180)
     doc.text(
@@ -187,8 +178,7 @@ export async function GET(req: Request) {
         "Content-Disposition": `attachment; filename="rapport_habitants_${now.toISOString().split("T")[0]}.pdf"`,
       },
     })
-  } catch (error) {
-    console.error("PDF error:", error)
+  } catch {
     return NextResponse.json(
       { error: "Erreur lors de la génération du PDF" },
       { status: 500 }

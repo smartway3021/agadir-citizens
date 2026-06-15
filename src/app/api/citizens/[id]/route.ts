@@ -46,14 +46,12 @@ export async function PUT(
 
     updates.updated_at = new Date().toISOString()
 
-    const { data, error } = await supabase
+    const { data } = await supabase
       .from("citizens")
       .update(updates)
       .eq("id", id)
       .select()
       .single()
-
-    if (error) throw error
 
     revalidatePath(`/dashboard/citizens/${id}`)
     revalidatePath("/dashboard/citizens")
@@ -74,9 +72,7 @@ export async function DELETE(
     const { id } = await ctx.params
     const supabase = createAdminClient()
 
-    const { error } = await supabase.from("citizens").delete().eq("id", id)
-
-    if (error) throw error
+    await supabase.from("citizens").delete().eq("id", id)
 
     revalidatePath("/dashboard/citizens")
     return NextResponse.json({ success: true })

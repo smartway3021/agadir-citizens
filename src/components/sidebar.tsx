@@ -4,12 +4,15 @@ import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
 import { cn } from "@/lib/utils"
 import { createClient } from "@/lib/supabase/client"
+import { useTheme } from "@/components/theme-provider"
 import {
   LayoutDashboard,
   Users,
   FileText,
   LogOut,
   Plus,
+  Moon,
+  Sun,
 } from "lucide-react"
 
 const navItems = [
@@ -23,6 +26,7 @@ export function Sidebar() {
   const pathname = usePathname()
   const router = useRouter()
   const supabase = createClient()
+  const { theme, toggleTheme } = useTheme()
 
   async function handleLogout() {
     await supabase.auth.signOut()
@@ -31,7 +35,7 @@ export function Sidebar() {
   }
 
   return (
-    <aside className="fixed left-0 top-0 h-full w-64 bg-primary text-white flex flex-col">
+    <aside className="fixed left-0 top-0 h-full w-64 bg-primary text-white flex flex-col z-50">
       <div className="p-6 border-b border-primary-light/30">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center">
@@ -66,7 +70,14 @@ export function Sidebar() {
         })}
       </nav>
 
-      <div className="p-4 border-t border-primary-light/30">
+      <div className="p-4 border-t border-primary-light/30 space-y-1">
+        <button
+          onClick={toggleTheme}
+          className="flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-white/70 hover:text-white hover:bg-white/10 w-full transition-colors"
+        >
+          {theme === "dark" ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+          {theme === "dark" ? "Mode clair" : "Mode sombre"}
+        </button>
         <button
           onClick={handleLogout}
           className="flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-white/70 hover:text-white hover:bg-white/10 w-full transition-colors"

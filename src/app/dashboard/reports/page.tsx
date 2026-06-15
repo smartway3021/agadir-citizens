@@ -101,7 +101,7 @@ export default function ReportsPage() {
           </CardHeader>
           <CardContent className="space-y-4">
             <div>
-              <p className="text-sm font-medium text-gray-700 mb-2">
+              <p className="text-sm font-medium mb-2">
                 <Calendar className="w-4 h-4 inline mr-1" />
                 Période
               </p>
@@ -119,7 +119,7 @@ export default function ReportsPage() {
                     className={`px-3 py-2 rounded-lg text-sm font-medium border transition-colors ${
                       period === opt.value
                         ? "bg-primary text-white border-primary"
-                        : "bg-white text-gray-700 border-border hover:border-primary"
+                        : "bg-card text-foreground border-border hover:border-primary"
                     }`}
                   >
                     {opt.label}
@@ -131,32 +131,28 @@ export default function ReportsPage() {
             {period === "custom" && (
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Date début
-                  </label>
+                  <label className="block text-sm font-medium mb-1">Date début</label>
                   <input
                     type="date"
                     value={customStart}
                     onChange={(e) => setCustomStart(e.target.value)}
-                    className="w-full rounded-lg border border-border px-3 py-2 text-sm"
+                    className="w-full rounded-lg border border-border bg-card px-3 py-2 text-sm"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Date fin
-                  </label>
+                  <label className="block text-sm font-medium mb-1">Date fin</label>
                   <input
                     type="date"
                     value={customEnd}
                     onChange={(e) => setCustomEnd(e.target.value)}
-                    className="w-full rounded-lg border border-border px-3 py-2 text-sm"
+                    className="w-full rounded-lg border border-border bg-card px-3 py-2 text-sm"
                   />
                 </div>
               </div>
             )}
 
             <div>
-              <p className="text-sm font-medium text-gray-700 mb-2">
+              <p className="text-sm font-medium mb-2">
                 <MapPin className="w-4 h-4 inline mr-1" />
                 Secteur (optionnel)
               </p>
@@ -165,7 +161,7 @@ export default function ReportsPage() {
                 value={sector}
                 onChange={(e) => setSector(e.target.value)}
                 placeholder="Tous les secteurs"
-                className="w-full rounded-lg border border-border px-3 py-2 text-sm"
+                className="w-full rounded-lg border border-border bg-card px-3 py-2 text-sm"
               />
             </div>
 
@@ -201,7 +197,7 @@ export default function ReportsPage() {
           </CardHeader>
           <CardContent className="space-y-4">
             <div>
-              <p className="text-sm font-medium text-gray-700 mb-2">
+              <p className="text-sm font-medium mb-2">
                 <MapPin className="w-4 h-4 inline mr-1" />
                 Filtre par secteur (optionnel)
               </p>
@@ -210,36 +206,32 @@ export default function ReportsPage() {
                 value={sector}
                 onChange={(e) => setSector(e.target.value)}
                 placeholder="Tous les secteurs"
-                className="w-full rounded-lg border border-border px-3 py-2 text-sm"
+                className="w-full rounded-lg border border-border bg-card px-3 py-2 text-sm"
               />
             </div>
 
             <div>
-              <p className="text-sm font-medium text-gray-700 mb-2">
+              <p className="text-sm font-medium mb-2">
                 <Calendar className="w-4 h-4 inline mr-1" />
                 Filtre par date (optionnel)
               </p>
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Date début
-                  </label>
+                  <label className="block text-sm font-medium mb-1">Date début</label>
                   <input
                     type="date"
                     value={customStart}
                     onChange={(e) => setCustomStart(e.target.value)}
-                    className="w-full rounded-lg border border-border px-3 py-2 text-sm"
+                    className="w-full rounded-lg border border-border bg-card px-3 py-2 text-sm"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Date fin
-                  </label>
+                  <label className="block text-sm font-medium mb-1">Date fin</label>
                   <input
                     type="date"
                     value={customEnd}
                     onChange={(e) => setCustomEnd(e.target.value)}
-                    className="w-full rounded-lg border border-border px-3 py-2 text-sm"
+                    className="w-full rounded-lg border border-border bg-card px-3 py-2 text-sm"
                   />
                 </div>
               </div>
@@ -260,9 +252,9 @@ export default function ReportsPage() {
               Exporter en Excel
             </Button>
 
-            <div className="bg-gray-50 rounded-lg p-3">
+            <div className="bg-gray-50 dark:bg-gray-800/50 rounded-lg p-3">
               <p className="text-xs text-muted">
-                Colonnes: Nom, Prénom, CIN, Date de naissance, Adresse, Secteur, Sexe, Date d&apos;ajout
+                Colonnes: Nom, Prénom, Père, Mère, CIN, Date naiss., Téléphone, Profession, Situation, Nationalité, Adresse, Secteur, Sexe, Date d&apos;ajout
               </p>
             </div>
           </CardContent>

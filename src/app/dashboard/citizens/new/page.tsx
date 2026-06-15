@@ -19,10 +19,8 @@ import {
 import Link from "next/link"
 
 const sectors = [
-  "Agadir", "Casablanca", "Rabat", "Marrakech", "Fès", "Tanger",
-  "Meknès", "Oujda", "Kénitra", "Tétouan", "Safi", "El Jadida",
-  "Beni Mellal", "Laâyoune", "Tiznit", "Inezgane", "Aït Melloul",
-  "Taroudant", "Ouarzazate", "Dakhla",
+  "Agadir Ville", "Anza", "Talborjt", "Charaf", "Dakhla",
+  "Hay Salam", "Inezgane", "Aït Melloul", "Tiznit",
 ]
 
 export default function NewCitizenPage() {
@@ -37,11 +35,17 @@ export default function NewCitizenPage() {
   const [formData, setFormData] = useState({
     first_name: "",
     last_name: "",
+    father_name: "",
+    mother_name: "",
     national_id: "",
     birth_date: "",
     address: "",
     sector: "",
     gender: "male" as "male" | "female",
+    phone: "",
+    profession: "",
+    marital_status: "single" as "single" | "married" | "divorced" | "widowed",
+    nationality: "Marocaine",
   })
   const [showCamera, setShowCamera] = useState<"front" | "back" | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -353,7 +357,7 @@ export default function NewCitizenPage() {
                   <Button
                     size="lg"
                     onClick={() => {
-                      setStep("preview")
+                      setStep("form")
                       handleOcrExtract()
                     }}
                     disabled={loading}
@@ -374,35 +378,41 @@ export default function NewCitizenPage() {
 
           {step === "form" && (
             <form onSubmit={handleSubmit} className="space-y-4">
+              <h3 className="font-semibold text-sm text-muted border-b border-border pb-2">
+                Identité
+              </h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <Input
                   id="last_name"
                   label="Nom"
                   value={formData.last_name}
-                  onChange={(e) =>
-                    setFormData((p) => ({ ...p, last_name: e.target.value }))
-                  }
+                  onChange={(e) => setFormData((p) => ({ ...p, last_name: e.target.value }))}
                   required
                 />
                 <Input
                   id="first_name"
                   label="Prénom"
                   value={formData.first_name}
-                  onChange={(e) =>
-                    setFormData((p) => ({ ...p, first_name: e.target.value }))
-                  }
+                  onChange={(e) => setFormData((p) => ({ ...p, first_name: e.target.value }))}
                   required
                 />
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <Input
+                  id="father_name"
+                  label="Nom du père"
+                  value={formData.father_name}
+                  onChange={(e) => setFormData((p) => ({ ...p, father_name: e.target.value }))}
+                />
+                <Input
+                  id="mother_name"
+                  label="Nom de la mère"
+                  value={formData.mother_name}
+                  onChange={(e) => setFormData((p) => ({ ...p, mother_name: e.target.value }))}
+                />
                 <Input
                   id="national_id"
                   label="CIN"
                   value={formData.national_id}
-                  onChange={(e) =>
-                    setFormData((p) => ({ ...p, national_id: e.target.value }))
-                  }
+                  onChange={(e) => setFormData((p) => ({ ...p, national_id: e.target.value }))}
                   required
                 />
                 <Input
@@ -410,90 +420,97 @@ export default function NewCitizenPage() {
                   label="Date de naissance"
                   type="date"
                   value={formData.birth_date}
-                  onChange={(e) =>
-                    setFormData((p) => ({ ...p, birth_date: e.target.value }))
-                  }
-                  required
-                />
-              </div>
-
-              <Input
-                id="address"
-                label="Adresse"
-                value={formData.address}
-                onChange={(e) =>
-                  setFormData((p) => ({ ...p, address: e.target.value }))
-                }
-                required
-              />
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <Select
-                  id="sector"
-                  label="Secteur"
-                  value={formData.sector}
-                  onChange={(e) =>
-                    setFormData((p) => ({ ...p, sector: e.target.value }))
-                  }
-                  options={sectors.map((c) => ({
-                    value: c,
-                    label: c,
-                  }))}
+                  onChange={(e) => setFormData((p) => ({ ...p, birth_date: e.target.value }))}
                   required
                 />
                 <Select
                   id="gender"
                   label="Sexe"
                   value={formData.gender}
-                  onChange={(e) =>
-                    setFormData((p) => ({
-                      ...p,
-                      gender: e.target.value as "male" | "female",
-                    }))
-                  }
+                  onChange={(e) => setFormData((p) => ({ ...p, gender: e.target.value as "male" | "female" }))}
                   options={[
                     { value: "male", label: "Homme" },
                     { value: "female", label: "Femme" },
                   ]}
                   required
                 />
+                <Input
+                  id="nationality"
+                  label="Nationalité"
+                  value={formData.nationality}
+                  onChange={(e) => setFormData((p) => ({ ...p, nationality: e.target.value }))}
+                />
               </div>
 
+              <h3 className="font-semibold text-sm text-muted border-b border-border pb-2 pt-2">
+                Contact & Profession
+              </h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <Input
+                  id="phone"
+                  label="Téléphone"
+                  type="tel"
+                  value={formData.phone}
+                  onChange={(e) => setFormData((p) => ({ ...p, phone: e.target.value }))}
+                />
+                <Input
+                  id="profession"
+                  label="Profession"
+                  value={formData.profession}
+                  onChange={(e) => setFormData((p) => ({ ...p, profession: e.target.value }))}
+                />
+                <Select
+                  id="marital_status"
+                  label="Situation familiale"
+                  value={formData.marital_status}
+                  onChange={(e) => setFormData((p) => ({ ...p, marital_status: e.target.value as "single" | "married" | "divorced" | "widowed" }))}
+                  options={[
+                    { value: "single", label: "Célibataire" },
+                    { value: "married", label: "Marié(e)" },
+                    { value: "divorced", label: "Divorcé(e)" },
+                    { value: "widowed", label: "Veuf/Veuve" },
+                  ]}
+                />
+              </div>
+
+              <h3 className="font-semibold text-sm text-muted border-b border-border pb-2 pt-2">
+                Adresse
+              </h3>
+              <Input
+                id="address"
+                label="Adresse"
+                value={formData.address}
+                onChange={(e) => setFormData((p) => ({ ...p, address: e.target.value }))}
+                required
+              />
+              <Select
+                id="sector"
+                label="Secteur"
+                value={formData.sector}
+                onChange={(e) => setFormData((p) => ({ ...p, sector: e.target.value }))}
+                options={sectors.map((s) => ({ value: s, label: s }))}
+                required
+              />
+
               {(frontImage || backImage) && (
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
                   {frontImage && (
                     <div>
-                      <p className="text-sm font-medium text-gray-700 mb-1">
-                        Recto
-                      </p>
-                      <img
-                        src={frontImage}
-                        alt="Recto"
-                        className="max-h-32 rounded-lg border"
-                      />
+                      <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Recto</p>
+                      <img src={frontImage} alt="Recto" className="max-h-32 rounded-lg border" />
                     </div>
                   )}
                   {backImage && (
                     <div>
-                      <p className="text-sm font-medium text-gray-700 mb-1">
-                        Verso
-                      </p>
-                      <img
-                        src={backImage}
-                        alt="Verso"
-                        className="max-h-32 rounded-lg border"
-                      />
+                      <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Verso</p>
+                      <img src={backImage} alt="Verso" className="max-h-32 rounded-lg border" />
                     </div>
                   )}
                 </div>
               )}
 
               <div className="flex gap-3 pt-4">
-                <Button
-                  type="button"
-                  variant="ghost"
-                  onClick={() => setStep("scan")}
-                >
+                <Button type="button" variant="ghost" onClick={() => setStep("scan")}>
                   Modifier les scans
                 </Button>
                 <Button type="submit" className="flex-1" size="lg" disabled={loading}>

@@ -27,8 +27,14 @@ export async function GET(req: Request) {
     const rows = (data || []).map((c: Record<string, unknown>) => ({
       "Nom": c.last_name,
       "Prénom": c.first_name,
+      "Nom du père": c.father_name || "",
+      "Nom de la mère": c.mother_name || "",
       "CIN": c.national_id,
       "Date de naissance": c.birth_date,
+      "Téléphone": c.phone || "",
+      "Profession": c.profession || "",
+      "Situation familiale": c.marital_status || "",
+      "Nationalité": c.nationality || "Marocaine",
       "Adresse": c.address,
       "Secteur": c.sector,
       "Sexe": c.gender === "male" ? "Homme" : "Femme",
@@ -39,8 +45,9 @@ export async function GET(req: Request) {
     const ws = XLSX.utils.json_to_sheet(rows)
 
     ws["!cols"] = [
-      { wch: 20 }, { wch: 20 }, { wch: 15 },
-      { wch: 18 }, { wch: 40 }, { wch: 15 },
+      { wch: 20 }, { wch: 20 }, { wch: 20 }, { wch: 20 },
+      { wch: 15 }, { wch: 18 }, { wch: 15 }, { wch: 20 },
+      { wch: 18 }, { wch: 15 }, { wch: 40 }, { wch: 15 },
       { wch: 10 }, { wch: 20 },
     ]
 
@@ -57,8 +64,7 @@ export async function GET(req: Request) {
         "Content-Disposition": `attachment; filename="${filename}"`,
       },
     })
-  } catch (error) {
-    console.error("Export error:", error)
+  } catch {
     return NextResponse.json(
       { error: "Erreur lors de l'export" },
       { status: 500 }

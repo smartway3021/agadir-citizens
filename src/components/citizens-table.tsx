@@ -5,7 +5,7 @@ import type { Citizen } from "@/lib/types"
 import { formatDate } from "@/lib/utils"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { Eye, Trash2 } from "lucide-react"
+import { Eye, Trash2, Phone, Briefcase } from "lucide-react"
 import { deleteCitizenAction } from "@/app/actions"
 import { useRouter } from "next/navigation"
 
@@ -44,23 +44,45 @@ export function CitizensTable({ citizens, currentPage, totalPages }: Props) {
               <th className="text-left py-3 px-4 font-medium text-muted">Nom</th>
               <th className="text-left py-3 px-4 font-medium text-muted">Prénom</th>
               <th className="text-left py-3 px-4 font-medium text-muted">CIN</th>
+              <th className="text-left py-3 px-4 font-medium text-muted">Téléphone</th>
               <th className="text-left py-3 px-4 font-medium text-muted">Secteur</th>
               <th className="text-left py-3 px-4 font-medium text-muted">Sexe</th>
+              <th className="text-left py-3 px-4 font-medium text-muted">Profession</th>
               <th className="text-left py-3 px-4 font-medium text-muted">Date d&apos;ajout</th>
               <th className="text-right py-3 px-4 font-medium text-muted">Actions</th>
             </tr>
           </thead>
           <tbody>
             {citizens.map((citizen) => (
-              <tr key={citizen.id} className="border-b border-border hover:bg-gray-50">
+              <tr key={citizen.id} className="border-b border-border hover:bg-gray-50 dark:hover:bg-gray-800/50">
                 <td className="py-3 px-4 font-medium">{citizen.last_name}</td>
                 <td className="py-3 px-4">{citizen.first_name}</td>
                 <td className="py-3 px-4">
                   <Badge>{citizen.national_id}</Badge>
                 </td>
+                <td className="py-3 px-4">
+                  {citizen.phone ? (
+                    <span className="flex items-center gap-1">
+                      <Phone className="w-3 h-3 text-muted" />
+                      {citizen.phone}
+                    </span>
+                  ) : (
+                    <span className="text-muted">-</span>
+                  )}
+                </td>
                 <td className="py-3 px-4">{citizen.sector}</td>
                 <td className="py-3 px-4">
                   {citizen.gender === "male" ? "Homme" : "Femme"}
+                </td>
+                <td className="py-3 px-4">
+                  {citizen.profession ? (
+                    <span className="flex items-center gap-1">
+                      <Briefcase className="w-3 h-3 text-muted" />
+                      {citizen.profession}
+                    </span>
+                  ) : (
+                    <span className="text-muted">-</span>
+                  )}
                 </td>
                 <td className="py-3 px-4 text-muted">
                   {formatDate(citizen.created_at)}

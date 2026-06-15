@@ -131,7 +131,7 @@ export default async function DashboardPage() {
                 </thead>
                 <tbody>
                   {recentCitizens.map((citizen) => (
-                    <tr key={citizen.id} className="border-b border-border hover:bg-gray-50 transition-colors">
+                    <tr key={citizen.id} className="border-b border-border hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
                       <td className="py-3 px-6 font-medium">{citizen.last_name}</td>
                       <td className="py-3 px-6">{citizen.first_name}</td>
                       <td className="py-3 px-6">
@@ -172,7 +172,7 @@ export default async function DashboardPage() {
                     <div key={sector} className="flex items-center justify-between">
                       <span className="text-sm font-medium">{sector}</span>
                       <div className="flex items-center gap-3">
-                        <div className="w-32 h-2 bg-gray-100 rounded-full overflow-hidden">
+                        <div className="w-32 h-2 bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden">
                           <div
                             className="h-full bg-primary rounded-full"
                             style={{
@@ -206,7 +206,7 @@ export default async function DashboardPage() {
                 <p className="text-sm font-medium">Hommes</p>
               </div>
               <div className="text-center flex-1">
-                <div className="w-20 h-20 bg-pink-100 rounded-full flex items-center justify-center mx-auto mb-2">
+                <div className="w-20 h-20 bg-pink-100 dark:bg-pink-900/30 rounded-full flex items-center justify-center mx-auto mb-2">
                   <span className="text-2xl font-bold text-pink-500">
                     {stats.by_gender.female}
                   </span>
